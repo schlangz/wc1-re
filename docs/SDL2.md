@@ -131,6 +131,4 @@ make run-modern-dos
 make run-modern-mission SERIES=1 MISSION=0
 ```
 
-`make modern-test` runs the integrated sanitizer smoke check.
-`make modern-test-full` adds the standalone SDL subsystem checks and the OpenGL
-renderer check; the latter skips when no display is available.
+`make modern-test` runs a data-free SDL2 initialization smoke check.

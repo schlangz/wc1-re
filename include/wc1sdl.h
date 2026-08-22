@@ -272,11 +272,11 @@ int Wc1SdlGetOriginFxMusicSequencePosition(void);
 void Wc1SdlMixOriginFxMusic(short *samples, unsigned int frameCount);
 int Wc1SdlPlayDosSoundEffect(int soundNumber, int volume, int pan,
                              int tag, int priority);
-int Wc1SdlHandlesGameSoundEffects(void);
-int Wc1SdlPlayGameSoundEffect(int soundNumber, int sourceObject,
-                              int looping);
-void Wc1SdlPlayWaveWithPan(const char *filename, int looping,
-                           int volume, int pan);
+int SdlHandlesGameSoundEffects(void);
+int SdlPlayGameSoundEffect(int soundNumber, int sourceObject,
+                           int looping);
+void SdlPlayWaveWithPan(const char *filename, int looping,
+                        int volume, int pan);
 void Wc1SdlServiceOriginFxMusic(void);
 void Wc1SdlStopDosSoundEffects(void);
 void Wc1SdlShutdownOriginFxAudio(void);

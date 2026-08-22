@@ -553,7 +553,7 @@ static void Wc1OriginFxWriteRegister(Wc1SdlOriginFxPlayer *player,
     player->oplRightChip.write(1, (uint8_t)value);
 }
 
-static void Wc1OriginFxWriteStereoRegister(
+static void OriginFxWriteStereoRegister(
     Wc1SdlOriginFxPlayer *player, unsigned int address,
     unsigned int leftValue, unsigned int rightValue)
 {
@@ -739,7 +739,7 @@ static unsigned int Wc1OriginFxCalculateCarrierLevel(
     return Wc1OriginFxClampTotalLevel(registerValue, totalLevel);
 }
 
-static unsigned int Wc1OriginFxCalculatePannedLevel(
+static unsigned int OriginFxCalculatePannedLevel(
     unsigned int registerValue, unsigned int pan, int rightChannel)
 {
     unsigned int scale;
@@ -783,11 +783,11 @@ static void Wc1OriginFxWriteVoiceLevels(Wc1SdlOriginFxPlayer *player,
     if (timbre[12] != 0 || channel->volume < 0x100U) {
         carrierLevel = Wc1OriginFxCalculateCarrierLevel(
             timbre[6], timbre[12], voice->velocity, channel->volume);
-        Wc1OriginFxWriteStereoRegister(
+        OriginFxWriteStereoRegister(
             player, 0x40 + carrierOffset,
-            Wc1OriginFxCalculatePannedLevel(
+            OriginFxCalculatePannedLevel(
                 carrierLevel, channel->pan, 0),
-            Wc1OriginFxCalculatePannedLevel(
+            OriginFxCalculatePannedLevel(
                 carrierLevel, channel->pan, 1));
     }
     if (timbre[13] != 0 ||
@@ -800,11 +800,11 @@ static void Wc1OriginFxWriteVoiceLevels(Wc1SdlOriginFxPlayer *player,
             modulatorLevel = timbre[1];
         }
         if ((timbre[10] & 1U) != 0) {
-            Wc1OriginFxWriteStereoRegister(
+            OriginFxWriteStereoRegister(
                 player, 0x40 + modulatorOffset,
-                Wc1OriginFxCalculatePannedLevel(
+                OriginFxCalculatePannedLevel(
                     modulatorLevel, channel->pan, 0),
-                Wc1OriginFxCalculatePannedLevel(
+                OriginFxCalculatePannedLevel(
                     modulatorLevel, channel->pan, 1));
         } else {
             Wc1OriginFxWriteRegister(
@@ -1557,7 +1557,7 @@ static void Wc1OriginFxProcessDueEvents(Wc1SdlOriginFxPlayer *player)
     }
 }
 
-static void Wc1OriginFxGenerateOutputSample(
+static void OriginFxGenerateOutputSample(
     Wc1SdlOriginFxPlayer *player, int32_t *leftSample,
     int32_t *rightSample)
 {
@@ -1783,7 +1783,7 @@ void Wc1SdlMixOriginFxSoundEffects(
     frame = 0;
     while (frame < frameCount) {
         Wc1OriginFxAdvanceService(player);
-        Wc1OriginFxGenerateOutputSample(
+        OriginFxGenerateOutputSample(
             player, &generatedLeft, &generatedRight);
         leftOutput = Wc1OriginFxScaleOutputSample(generatedLeft, gain);
         rightOutput = Wc1OriginFxScaleOutputSample(generatedRight, gain);
@@ -1849,7 +1849,7 @@ void Wc1SdlMixOriginFxPlayer(Wc1SdlOriginFxPlayer *player,
             return;
         }
         Wc1OriginFxAdvanceService(player);
-        Wc1OriginFxGenerateOutputSample(
+        OriginFxGenerateOutputSample(
             player, &generatedLeft, &generatedRight);
         leftOutput = Wc1OriginFxScaleOutputSample(generatedLeft, gain);
         rightOutput = Wc1OriginFxScaleOutputSample(generatedRight, gain);

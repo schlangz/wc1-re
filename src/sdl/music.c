@@ -6,10 +6,10 @@
 
 #define WC1_SDL_MUSIC_PATH_SIZE 4096
 #define WC1_SDL_ADLIB_TIMBRE_SECTION 1
-#define WC1_SDL_SOUND_METRES_PER_VOLUME_STEP 500L
-#define WC1_SDL_SOUND_FULL_VOLUME 127
-#define WC1_SDL_SOUND_AUDIBLE_VOLUME 10
-#define WC1_SDL_SOUND_CENTRE_PAN 64
+#define SDL_SOUND_METRES_PER_VOLUME_STEP 500L
+#define SDL_SOUND_FULL_VOLUME 127
+#define SDL_SOUND_AUDIBLE_VOLUME 10
+#define SDL_SOUND_CENTRE_PAN 64
 
 static CRITICAL_SECTION g_stWc1SdlDosMusicAudioCriticalSection;
 static SDL_mutex *g_pWc1SdlDosMusicMutex;
@@ -215,12 +215,12 @@ int Wc1SdlPlayDosSoundEffect(int soundNumber, int volume, int pan,
     return result;
 }
 
-int Wc1SdlHandlesGameSoundEffects(void)
+int SdlHandlesGameSoundEffects(void)
 {
     return 1;
 }
 
-int Wc1SdlPlayGameSoundEffect(int soundNumber, int sourceObject, int looping)
+int SdlPlayGameSoundEffect(int soundNumber, int sourceObject, int looping)
 {
     FixedVector delta;
     long magnitude;
@@ -231,7 +231,7 @@ int Wc1SdlPlayGameSoundEffect(int soundNumber, int sourceObject, int looping)
     int pan;
 
     magnitude = 0;
-    pan = WC1_SDL_SOUND_CENTRE_PAN;
+    pan = SDL_SOUND_CENTRE_PAN;
     if (sourceObject != -1) {
         if (sourceObject < 0 || sourceObject >= WC1_SPACE_OBJECT_COUNT)
             return 0;
@@ -242,7 +242,7 @@ int Wc1SdlPlayGameSoundEffect(int soundNumber, int sourceObject, int looping)
         NormalizeFixedVector(&delta);
         stereoOffset = dot_product(
             &delta, &aShipRightVector[WC1_EYE_OBJECT]);
-        scaledPan = stereoOffset * WC1_SDL_SOUND_CENTRE_PAN;
+        scaledPan = stereoOffset * SDL_SOUND_CENTRE_PAN;
         if (scaledPan < 0)
             scaledPan = -((-scaledPan + 0xff) / 0x100);
         else
@@ -255,14 +255,14 @@ int Wc1SdlPlayGameSoundEffect(int soundNumber, int sourceObject, int looping)
     }
 
     if (Wc1SdlUsingDosData()) {
-        volume = WC1_SDL_SOUND_FULL_VOLUME;
+        volume = SDL_SOUND_FULL_VOLUME;
         if (sourceObject != -1) {
             volume -= (int)((magnitude /
-                             WC1_SDL_SOUND_METRES_PER_VOLUME_STEP) >> 8);
+                             SDL_SOUND_METRES_PER_VOLUME_STEP) >> 8);
         }
         if (volume < 0)
             volume = 0;
-        if (volume < WC1_SDL_SOUND_AUDIBLE_VOLUME)
+        if (volume < SDL_SOUND_AUDIBLE_VOLUME)
             return 0;
         if (!Wc1SdlPlayDosSoundEffect(
                 soundNumber, volume, pan, sourceObject, looping))
@@ -282,7 +282,7 @@ int Wc1SdlPlayGameSoundEffect(int soundNumber, int sourceObject, int looping)
         return 0;
     aiSoundEffectSourceActive[sourceObject + 1] = 1;
     sprintf(szSfxWavePath, szSfxWaveFormat, soundNumber - 1);
-    Wc1SdlPlayWaveWithPan(szSfxWavePath, looping, distance, pan);
+    SdlPlayWaveWithPan(szSfxWavePath, looping, distance, pan);
     return 1;
 }
 

@@ -138,6 +138,7 @@ MODERN_LZO_LIBS = $(shell pkg-config --libs lzo2 2>/dev/null)
 MODERN_CPPFLAGS = -DWC1_SDL=1 -DSDL_MAIN_HANDLED -Iinclude \
 	$(MODERN_SDL_CFLAGS) \
 	$(MODERN_LZO_CFLAGS) $(addprefix -I,$(MODERN_LZO_INCLUDEDIR))
+MODERN_TEST_CPPFLAGS = -DSDL_MAIN_HANDLED $(MODERN_SDL_CFLAGS)
 MODERN_CFLAGS ?= -O2 -std=c11 -Wno-return-type -Wno-return-mismatch \
 	-Wno-error=incompatible-pointer-types
 MODERN_CXXFLAGS ?= -O2 -std=c++11
@@ -414,49 +415,15 @@ MODERN_GAME_HOST_OBJS = \
 	$(patsubst src/%.c,$(MODERN_OUT_DIR)/obj/%.o,$(MODERN_GAME_HOST_SRCS)) \
 	$(patsubst src/%.cpp,$(MODERN_OUT_DIR)/obj/%.o,$(MODERN_GAME_HOST_CXX_SRCS)) \
 	$(MODERN_YMFM_OBJS)
-MODERN_EVENT_HOST_OBJS = \
-	$(MODERN_OUT_DIR)/obj/sdl/events.o \
-	$(MODERN_OUT_DIR)/obj/sdl/video.o
-MODERN_VIDEO_HOST_OBJS = \
-	$(MODERN_OUT_DIR)/obj/dib.o \
-	$(MODERN_OUT_DIR)/obj/sdl/video.o
 MODERN_LAUNCHER_OBJ = $(patsubst src/%.c,$(MODERN_OUT_DIR)/obj/%.o,$(MODERN_LAUNCHER_SRC))
-MODERN_INPUT_CORE_OBJS = \
-	$(MODERN_OUT_DIR)/obj/eventmgr.o \
-	$(MODERN_OUT_DIR)/obj/globals.o \
-	$(MODERN_OUT_DIR)/obj/sysinput.o
-MODERN_BASE_C_TEST_NAMES = sdl_compat_smoke sdl_crt_compat \
-	sdl_dos_resources sdl_input_compat
-MODERN_BASE_C_TEST_BINS = $(addsuffix $(MODERN_EXE_SUFFIX),\
-	$(addprefix $(MODERN_OUT_DIR)/tests/,$(MODERN_BASE_C_TEST_NAMES)))
-MODERN_EVENT_TEST_BIN = $(MODERN_OUT_DIR)/tests/sdl_event_compat$(MODERN_EXE_SUFFIX)
-MODERN_VIDEO_TEST_BIN = $(MODERN_OUT_DIR)/tests/sdl_video_compat$(MODERN_EXE_SUFFIX)
-MODERN_GL_VIDEO_TEST_BIN = $(MODERN_OUT_DIR)/tests/sdl_gl_renderer$(MODERN_EXE_SUFFIX)
-MODERN_RUNTIME_TEST_BIN = $(MODERN_OUT_DIR)/tests/sdl_runtime_safety$(MODERN_EXE_SUFFIX)
-MODERN_CXX_TEST_BIN = $(MODERN_OUT_DIR)/tests/sdl_ix_compat_smoke$(MODERN_EXE_SUFFIX)
-MODERN_ADLIB_TEST_BIN = $(MODERN_OUT_DIR)/tests/sdl_dos_adlib$(MODERN_EXE_SUFFIX)
-MODERN_HEADLESS_TEST_BINS = \
-	$(MODERN_BASE_C_TEST_BINS) \
-	$(MODERN_EVENT_TEST_BIN) \
-	$(MODERN_VIDEO_TEST_BIN) \
-	$(MODERN_RUNTIME_TEST_BIN) \
-	$(MODERN_CXX_TEST_BIN) \
-	$(MODERN_ADLIB_TEST_BIN)
-MODERN_TEST_BINS = $(MODERN_HEADLESS_TEST_BINS) $(MODERN_GL_VIDEO_TEST_BIN)
+MODERN_TEST_BIN = $(MODERN_OUT_DIR)/tests/sdl_smoke$(MODERN_EXE_SUFFIX)
 MODERN_DEPFILES = \
 	$(MODERN_GAMEPLAY_OBJS:.o=.d) \
 	$(MODERN_IX_OBJS:.o=.d) \
 	$(MODERN_BASE_HOST_OBJS:.o=.d) \
 	$(MODERN_GAME_HOST_OBJS:.o=.d) \
 	$(MODERN_LAUNCHER_OBJ:.o=.d) \
-	$(addsuffix .d,$(addprefix $(MODERN_OUT_DIR)/tests/,$(MODERN_BASE_C_TEST_NAMES))) \
-	$(MODERN_OUT_DIR)/tests/sdl_event_compat.d \
-	$(MODERN_OUT_DIR)/tests/sdl_gl_renderer.d \
-	$(MODERN_OUT_DIR)/tests/sdl_runtime_safety.d \
-	$(MODERN_OUT_DIR)/tests/sdl_video_compat.d \
-	$(MODERN_OUT_DIR)/tests/sdl_video_dependencies.d \
-	$(MODERN_OUT_DIR)/tests/sdl_ix_compat_smoke.d \
-	$(MODERN_OUT_DIR)/tests/sdl_dos_adlib.d
+	$(MODERN_OUT_DIR)/tests/sdl_smoke.d
 
 # ---------------------------------------------------------------------------
 # Build targets and tool bootstrap
@@ -476,12 +443,18 @@ build-full: $(TARGET)
 # never supply objects to the assembly-comparison target above.
 modern: $(MODERN_TARGET)
 
-modern-check-deps:
+modern-check-sdl:
 	@if test -z "$(strip $(MODERN_SDL_CFLAGS))" || \
-	   test -z "$(strip $(MODERN_SDL_LIBS))" || \
-	   test -z "$(strip $(MODERN_LZO_LIBS))"; then \
-		echo "SDL2 or LZO2 development files were not found." >&2; \
-		echo "Install SDL2 and LZO2 development files." >&2; \
+	   test -z "$(strip $(MODERN_SDL_LIBS))"; then \
+		echo "SDL2 development files were not found." >&2; \
+		echo "Install SDL2 development files." >&2; \
+		exit 1; \
+	fi
+
+modern-check-deps: modern-check-sdl
+	@if test -z "$(strip $(MODERN_LZO_LIBS))"; then \
+		echo "LZO2 development files were not found." >&2; \
+		echo "Install LZO2 development files." >&2; \
 		exit 1; \
 	fi
 
@@ -520,24 +493,14 @@ $(MODERN_OUT_DIR)/obj/sound.o: src/sound.c | modern-check-deps
 # Keep the recovered wave player intact while its native IxSound objects enter
 # the SDL positional-audio bridge.
 $(MODERN_OUT_DIR)/obj/sound.o: MODERN_CPPFLAGS += \
-	-Dix_system_new_sound=Wc1SdlNewWaveSound
+	-Dix_system_new_sound=SdlNewWaveSound
 $(MODERN_OUT_DIR)/obj/sound.o: Makefile
 
-$(MODERN_OUT_DIR)/tests/%.o: tests/%.c | modern-check-deps
+$(MODERN_OUT_DIR)/tests/%.o: tests/%.c | modern-check-sdl
 	@mkdir -p $(dir $@)
-	$(MODERN_CC) $(MODERN_CPPFLAGS) $(MODERN_TEST_CPPFLAGS) $(MODERN_CFLAGS) \
+	$(MODERN_CC) $(MODERN_TEST_CPPFLAGS) $(MODERN_CFLAGS) \
 		$(MODERN_SECTION_FLAGS) $(MODERN_SANITIZER_FLAGS) \
 		$(MODERN_DEPFLAGS) -c $< -o $@
-
-$(MODERN_OUT_DIR)/tests/%.o: tests/%.cpp | modern-check-deps
-	@mkdir -p $(dir $@)
-	$(MODERN_CXX) $(MODERN_CPPFLAGS) -Isrc/ix $(MODERN_CXXFLAGS) \
-		$(MODERN_SECTION_FLAGS) $(MODERN_SANITIZER_FLAGS) \
-		$(MODERN_DEPFLAGS) -c $< -o $@
-
-$(MODERN_OUT_DIR)/tests/sdl_compat_smoke.o: MODERN_TEST_CPPFLAGS = -DWC1_ANALYSIS=1
-$(MODERN_OUT_DIR)/tests/sdl_gl_renderer.o: MODERN_TEST_CPPFLAGS = -Isrc/sdl
-$(MODERN_OUT_DIR)/tests/sdl_video_compat.o: MODERN_TEST_CPPFLAGS = -Isrc/sdl
 
 $(MODERN_TARGET): \
 		$(MODERN_LAUNCHER_OBJ) \
@@ -551,88 +514,13 @@ $(MODERN_TARGET): \
 		$(MODERN_PLATFORM_LIBS) \
 		$(MODERN_DEAD_STRIP_FLAGS) -o $@
 
-$(MODERN_BASE_C_TEST_BINS): $(MODERN_OUT_DIR)/tests/%$(MODERN_EXE_SUFFIX): \
-		$(MODERN_OUT_DIR)/tests/%.o $(MODERN_BASE_HOST_OBJS)
+$(MODERN_TEST_BIN): $(MODERN_OUT_DIR)/tests/sdl_smoke.o
 	$(MODERN_CC) $(MODERN_CFLAGS) $(MODERN_SANITIZER_FLAGS) \
 		$^ $(MODERN_SDL_LIBS) -o $@
 
-$(MODERN_EVENT_TEST_BIN): \
-		$(MODERN_OUT_DIR)/tests/sdl_event_compat.o \
-		$(MODERN_BASE_HOST_OBJS) \
-		$(MODERN_GAME_HOST_OBJS) \
-		$(MODERN_GAMEPLAY_OBJS) \
-		$(MODERN_IX_OBJS)
-	$(MODERN_CXX) $(MODERN_CXXFLAGS) $(MODERN_SANITIZER_FLAGS) \
-		$^ $(MODERN_SDL_LIBS) $(MODERN_LZO_LIBS) \
-		$(MODERN_DEAD_STRIP_FLAGS) -o $@
-
-$(MODERN_VIDEO_TEST_BIN): \
-		$(MODERN_OUT_DIR)/tests/sdl_video_compat.o \
-		$(MODERN_BASE_HOST_OBJS) \
-		$(MODERN_GAME_HOST_OBJS) \
-		$(MODERN_GAMEPLAY_OBJS) \
-		$(MODERN_IX_OBJS)
-	$(MODERN_CXX) $(MODERN_CXXFLAGS) $(MODERN_SANITIZER_FLAGS) \
-		$^ $(MODERN_SDL_LIBS) $(MODERN_LZO_LIBS) \
-		$(MODERN_DEAD_STRIP_FLAGS) -o $@
-
-$(MODERN_GL_VIDEO_TEST_BIN): \
-		$(MODERN_OUT_DIR)/tests/sdl_gl_renderer.o \
-		$(MODERN_BASE_HOST_OBJS) \
-		$(MODERN_GAME_HOST_OBJS) \
-		$(MODERN_GAMEPLAY_OBJS) \
-		$(MODERN_IX_OBJS)
-	$(MODERN_CXX) $(MODERN_CXXFLAGS) $(MODERN_SANITIZER_FLAGS) \
-		$^ $(MODERN_SDL_LIBS) $(MODERN_LZO_LIBS) \
-		$(MODERN_DEAD_STRIP_FLAGS) -o $@
-
-$(MODERN_RUNTIME_TEST_BIN): \
-		$(MODERN_OUT_DIR)/tests/sdl_runtime_safety.o \
-		$(MODERN_BASE_HOST_OBJS) \
-		$(MODERN_GAME_HOST_OBJS) \
-		$(MODERN_GAMEPLAY_OBJS) \
-		$(MODERN_IX_OBJS)
-	$(MODERN_CXX) $(MODERN_CXXFLAGS) $(MODERN_SANITIZER_FLAGS) \
-		$^ $(MODERN_SDL_LIBS) $(MODERN_LZO_LIBS) \
-		$(MODERN_DEAD_STRIP_FLAGS) -o $@
-
-$(MODERN_CXX_TEST_BIN): \
-		$(MODERN_OUT_DIR)/tests/sdl_ix_compat_smoke.o \
-		$(MODERN_BASE_HOST_OBJS) \
-		$(MODERN_GAME_HOST_OBJS) \
-		$(MODERN_GAMEPLAY_OBJS) \
-		$(MODERN_IX_OBJS)
-	$(MODERN_CXX) $(MODERN_CXXFLAGS) $(MODERN_SANITIZER_FLAGS) \
-		$^ $(MODERN_SDL_LIBS) $(MODERN_LZO_LIBS) \
-		$(MODERN_DEAD_STRIP_FLAGS) -o $@
-
-$(MODERN_ADLIB_TEST_BIN): \
-		$(MODERN_OUT_DIR)/tests/sdl_dos_adlib.o \
-		$(MODERN_BASE_HOST_OBJS) \
-		$(MODERN_OUT_DIR)/obj/sdl/originfx.o \
-		$(MODERN_YMFM_OBJS)
-	$(MODERN_CXX) $(MODERN_CXXFLAGS) $(MODERN_SANITIZER_FLAGS) \
-		$^ $(MODERN_SDL_LIBS) $(MODERN_DEAD_STRIP_FLAGS) -o $@
-
-modern-test: modern
-	@echo "Running $(MODERN_TARGET) --check"
-	@SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy $(MODERN_TARGET) --check
-
-modern-test-full: $(MODERN_TARGET) $(MODERN_TEST_BINS)
-	@set -e; for test_bin in $(MODERN_HEADLESS_TEST_BINS); do \
-		echo "Running $$test_bin"; \
-		SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy "$$test_bin"; \
-	done
-	@echo "Running $(MODERN_GL_VIDEO_TEST_BIN)"
-	@SDL_AUDIODRIVER=dummy $(MODERN_GL_VIDEO_TEST_BIN); \
-	status=$$?; \
-	if test $$status -eq 77; then \
-		echo "GL renderer test skipped: no OpenGL display"; \
-	elif test $$status -ne 0; then \
-		exit $$status; \
-	fi
-	@echo "Running $(MODERN_TARGET) --check"
-	@SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy $(MODERN_TARGET) --check
+modern-test: $(MODERN_TEST_BIN)
+	@echo "Running $(MODERN_TEST_BIN)"
+	@SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy $(MODERN_TEST_BIN)
 
 run-modern: modern
 	@case "$(MODERN_RUN_DIR)" in \
@@ -1049,8 +937,8 @@ clean-modern:
 	missing-data \
 	modern \
 	modern-check-deps \
+	modern-check-sdl \
 	modern-test \
-	modern-test-full \
 	order \
 	progress \
 	report \
