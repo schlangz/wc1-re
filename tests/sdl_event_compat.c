@@ -77,6 +77,8 @@ int main(int argumentCount, char **arguments)
     memset(&event, 0, sizeof(event));
     event.type = SDL_MOUSEMOTION;
     event.motion.windowID = SDL_GetWindowID(window);
+    event.motion.x = windowWidth / 2;
+    event.motion.y = windowHeight / 2;
     if (SDL_PushEvent(&event) != 1 || PumpWindowMessages() == 0)
         return 1;
     if (GetNextInputEvent(&input) != 13 || input.x != 160 || input.y != 100)
@@ -136,6 +138,8 @@ int main(int argumentCount, char **arguments)
     memset(&event, 0, sizeof(event));
     event.type = SDL_MOUSEMOTION;
     event.motion.windowID = SDL_GetWindowID(window);
+    event.motion.x = 400;
+    event.motion.y = 200;
     if (SDL_PushEvent(&event) != 1 || PumpWindowMessages() == 0)
         return 1;
     if (GetNextInputEvent(&input) != 13 || input.x != 160 || input.y != 100)
@@ -144,6 +148,8 @@ int main(int argumentCount, char **arguments)
     SDL_WarpMouseInWindow(window, 80, 0);
     SDL_PumpEvents();
     SDL_FlushEvent(SDL_MOUSEMOTION);
+    event.motion.x = 80;
+    event.motion.y = 0;
     if (SDL_PushEvent(&event) != 1 || PumpWindowMessages() == 0)
         return 1;
     if (GetNextInputEvent(&input) != 13 || input.x != 0 || input.y != 0)
@@ -154,6 +160,8 @@ int main(int argumentCount, char **arguments)
     SDL_WarpMouseInWindow(window, 400, 200);
     SDL_PumpEvents();
     SDL_FlushEvent(SDL_MOUSEMOTION);
+    event.motion.x = 400;
+    event.motion.y = 200;
     index = 0;
     while (index < 300) {
         if (SDL_PushEvent(&event) != 1)

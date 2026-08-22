@@ -473,8 +473,14 @@ static void Wc1SdlHandleMouseEvent(const SDL_Event *event)
     window = SDL_GetWindowFromID(event->type == SDL_MOUSEMOTION
                                      ? event->motion.windowID
                                      : event->button.windowID);
-    buttons = SDL_GetMouseState(&mouseX, &mouseY);
-    if (event->type != SDL_MOUSEMOTION) {
+    if (event->type == SDL_MOUSEMOTION) {
+        mouseX = event->motion.x;
+        mouseY = event->motion.y;
+        buttons = event->motion.state;
+    } else {
+        mouseX = event->button.x;
+        mouseY = event->button.y;
+        buttons = SDL_GetMouseState(0, 0);
         if (event->type == SDL_MOUSEBUTTONDOWN)
             buttons |= SDL_BUTTON(event->button.button);
         else

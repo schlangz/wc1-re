@@ -530,6 +530,7 @@ $(MODERN_OUT_DIR)/tests/%.o: tests/%.cpp | modern-check-deps
 
 $(MODERN_OUT_DIR)/tests/sdl_compat_smoke.o: MODERN_TEST_CPPFLAGS = -DWC1_ANALYSIS=1
 $(MODERN_OUT_DIR)/tests/sdl_gl_renderer.o: MODERN_TEST_CPPFLAGS = -Isrc/sdl
+$(MODERN_OUT_DIR)/tests/sdl_video_compat.o: MODERN_TEST_CPPFLAGS = -Isrc/sdl
 
 $(MODERN_TARGET): \
 		$(MODERN_LAUNCHER_OBJ) \

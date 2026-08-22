@@ -402,10 +402,19 @@ static int CheckSharpBilinearPaletteIndices(Viewport *viewport,
     int logicalY;
     int deviceX;
     int deviceY;
+    int frameHeight;
+    int frameWidth;
+    int viewportBottom;
+    int viewportHeight;
+    int viewportLeft;
+    int viewportTop;
+    int viewportWidth;
     int result;
 
+    frameWidth = 960;
+    frameHeight = 600;
     shape = CreateIndexRampShape();
-    frame = (unsigned char *)malloc(640 * 400 * 4);
+    frame = (unsigned char *)malloc((size_t)frameWidth * frameHeight * 4);
     readPixels =
         (Wc1TestGlReadPixelsProc)SDL_GL_GetProcAddress("glReadPixels");
     readBuffer =
@@ -416,6 +425,8 @@ static int CheckSharpBilinearPaletteIndices(Viewport *viewport,
             ReleasePacketHandle(shape);
         return 0;
     }
+    SDL_SetWindowSize((SDL_Window *)hDIBWindow, frameWidth, frameHeight);
+    SDL_PumpEvents();
     index = 1;
     while (index <= 32) {
         entry[0] = (short)(index * 7);
@@ -432,8 +443,13 @@ static int CheckSharpBilinearPaletteIndices(Viewport *viewport,
     DIBslam();
     DIBslamReal();
     readBuffer(GL_FRONT);
-    readPixels(0, 0, 640, 400, GL_RGBA, GL_UNSIGNED_BYTE, frame);
+    readPixels(0, 0, frameWidth, frameHeight, GL_RGBA, GL_UNSIGNED_BYTE,
+               frame);
     Wc1SdlCancelSpaceFrame();
+    Wc1SdlCalculateOutputViewport(frameWidth, frameHeight, &viewportLeft,
+                                  &viewportBottom, &viewportWidth,
+                                  &viewportHeight);
+    viewportTop = frameHeight - viewportBottom - viewportHeight;
 
     row = 0;
     while (row < 4 && result != 0) {
@@ -442,12 +458,23 @@ static int CheckSharpBilinearPaletteIndices(Viewport *viewport,
             index = row * 8 + column + 1;
             logicalX = 160 - 4 + column;
             logicalY = 100 - 2 + row;
-            deviceX = logicalX * 2;
-            deviceY = logicalY * 2;
-            pixel = frame + ((399 - deviceY) * 640 + deviceX) * 4;
+            deviceX = viewportLeft +
+                      (int)((Sint64)(logicalX * 2 + 1) * viewportWidth /
+                            (WC1_SDL_FRAME_WIDTH * 2));
+            deviceY = viewportTop +
+                      (int)((Sint64)(logicalY * 2 + 1) * viewportHeight /
+                            (WC1_SDL_FRAME_HEIGHT * 2));
+            pixel = frame +
+                    ((frameHeight - 1 - deviceY) * frameWidth + deviceX) * 4;
             if (pixel[0] != (unsigned char)(index * 7) ||
                 pixel[1] != (unsigned char)(255 - index * 5) ||
                 pixel[2] != (unsigned char)(index * 3 + 64)) {
+                fprintf(stderr,
+                        "GL palette index %d at logical %d,%d mapped to "
+                        "%d,%d as %u,%u,%u.\n",
+                        index, logicalX, logicalY, deviceX, deviceY,
+                        (unsigned int)pixel[0], (unsigned int)pixel[1],
+                        (unsigned int)pixel[2]);
                 result = 0;
                 break;
             }
@@ -455,6 +482,7 @@ static int CheckSharpBilinearPaletteIndices(Viewport *viewport,
         }
         row++;
     }
+    SDL_SetWindowSize((SDL_Window *)hDIBWindow, 640, 400);
     free(frame);
     ReleasePacketHandle(shape);
     return result;
@@ -626,6 +654,12 @@ static int CheckSharpBilinearViewportOffset(Viewport *viewport,
     int offsetTop;
     int offsetRight;
     int offsetBottom;
+    int expectedOffsetX;
+    int expectedOffsetY;
+    int viewportBottom;
+    int viewportHeight;
+    int viewportLeft;
+    int viewportWidth;
     int result;
 
     shape = CreateTransformTestShape(1);
@@ -673,11 +707,21 @@ static int CheckSharpBilinearViewportOffset(Viewport *viewport,
     readPixels(0, 0, 640, 400, GL_RGBA, GL_UNSIGNED_BYTE, frame);
     result = result && FindRgbaBounds(frame, 1, &offsetLeft, &offsetTop,
                                       &offsetRight, &offsetBottom);
+    Wc1SdlCalculateOutputViewport(640, 400, &viewportLeft, &viewportBottom,
+                                  &viewportWidth, &viewportHeight);
+    expectedOffsetX = (40 * viewportWidth + WC1_SDL_FRAME_WIDTH / 2) /
+                      WC1_SDL_FRAME_WIDTH;
+    expectedOffsetY = (30 * viewportHeight + WC1_SDL_FRAME_HEIGHT / 2) /
+                      WC1_SDL_FRAME_HEIGHT;
     result =
-        result && offsetLeft - baseLeft >= 78 && offsetLeft - baseLeft <= 82 &&
-        offsetTop - baseTop >= 58 && offsetTop - baseTop <= 62 &&
-        offsetRight - baseRight >= 78 && offsetRight - baseRight <= 82 &&
-        offsetBottom - baseBottom >= 58 && offsetBottom - baseBottom <= 62;
+        result && offsetLeft - baseLeft >= expectedOffsetX - 2 &&
+        offsetLeft - baseLeft <= expectedOffsetX + 2 &&
+        offsetTop - baseTop >= expectedOffsetY - 2 &&
+        offsetTop - baseTop <= expectedOffsetY + 2 &&
+        offsetRight - baseRight >= expectedOffsetX - 2 &&
+        offsetRight - baseRight <= expectedOffsetX + 2 &&
+        offsetBottom - baseBottom >= expectedOffsetY - 2 &&
+        offsetBottom - baseBottom <= expectedOffsetY + 2;
     Wc1SdlCancelSpaceFrame();
     free(frame);
     free(geometry);
@@ -700,12 +744,12 @@ static int CheckLetterboxedInputMapping(SDL_Window *window)
     result = windowWidth == 1000 && windowHeight == 700;
     result =
         result && Wc1SdlMapLogicalToWindow(window, 0, 0, &windowX, &windowY);
-    result = result && windowX == 20 && windowY == 50;
+    result = result && windowX == 33 && windowY == 0;
     result = result &&
              Wc1SdlMapLogicalToWindow(window, 160, 100, &windowX, &windowY);
     result = result && windowX == 500 && windowY == 350;
     result = result &&
-             Wc1SdlMapWindowToLogical(window, 20, 50, &logicalX, &logicalY);
+             Wc1SdlMapWindowToLogical(window, 33, 0, &logicalX, &logicalY);
     result = result && logicalX == 0 && logicalY == 0;
     result = result &&
              Wc1SdlMapWindowToLogical(window, 500, 350, &logicalX, &logicalY);
