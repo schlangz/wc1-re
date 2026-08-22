@@ -35,6 +35,10 @@ The DOS release describes sound effects as compact OriginFX command records,
 not sampled WAV or VOC files. The SDL host interprets those records and mixes
 their YM3812 output with music in the existing audio callback.
 
+In flight, both the sampled Kilrathi Saga effects and synthesized DOS effects
+use left/right pan derived from the source's direction relative to the current
+camera. Synthesized DOS effects also retain the recovered distance falloff.
+
 ## Enhanced renderer
 
 `--enhanced` selects the optional OpenGL 3.2 renderer. It records the ordered

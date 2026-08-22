@@ -394,7 +394,8 @@ MODERN_GAME_HOST_SRCS = \
 	src/sdl/music.c \
 	src/sdl/video.c
 MODERN_GAME_HOST_CXX_SRCS = \
-	src/sdl/originfx.cpp
+	src/sdl/originfx.cpp \
+	src/sdl/wave.cpp
 MODERN_YMFM_SRCS = \
 	third_party/ymfm/ymfm_adpcm.cpp \
 	third_party/ymfm/ymfm_opl.cpp \
@@ -515,6 +516,12 @@ $(MODERN_OUT_DIR)/obj/sound.o: src/sound.c | modern-check-deps
 	$(MODERN_CXX) $(MODERN_CPPFLAGS) -Isrc/ix $(MODERN_CXXFLAGS) \
 		$(MODERN_SECTION_FLAGS) $(MODERN_SANITIZER_FLAGS) \
 		$(MODERN_DEPFLAGS) -x c++ -c $< -o $@
+
+# Keep the recovered wave player intact while its native IxSound objects enter
+# the SDL positional-audio bridge.
+$(MODERN_OUT_DIR)/obj/sound.o: MODERN_CPPFLAGS += \
+	-Dix_system_new_sound=Wc1SdlNewWaveSound
+$(MODERN_OUT_DIR)/obj/sound.o: Makefile
 
 $(MODERN_OUT_DIR)/tests/%.o: tests/%.c | modern-check-deps
 	@mkdir -p $(dir $@)

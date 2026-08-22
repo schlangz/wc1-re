@@ -1409,6 +1409,10 @@ void PlaySfxWaveFileByNumber(int soundNumber, int sourceObject, int looping)
     int distance;
 
 #ifdef WC1_SDL
+    if (Wc1SdlHandlesGameSoundEffects()) {
+        Wc1SdlPlayGameSoundEffect(soundNumber, sourceObject, looping);
+        return;
+    }
     if (Wc1SdlUsingDosData()) {
         int volume;
 

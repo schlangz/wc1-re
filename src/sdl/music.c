@@ -6,6 +6,10 @@
 
 #define WC1_SDL_MUSIC_PATH_SIZE 4096
 #define WC1_SDL_ADLIB_TIMBRE_SECTION 1
+#define WC1_SDL_SOUND_METRES_PER_VOLUME_STEP 500L
+#define WC1_SDL_SOUND_FULL_VOLUME 127
+#define WC1_SDL_SOUND_AUDIBLE_VOLUME 10
+#define WC1_SDL_SOUND_CENTRE_PAN 64
 
 static CRITICAL_SECTION g_stWc1SdlDosMusicAudioCriticalSection;
 static SDL_mutex *g_pWc1SdlDosMusicMutex;
@@ -209,6 +213,77 @@ int Wc1SdlPlayDosSoundEffect(int soundNumber, int volume, int pan,
         (unsigned int)soundNumber, volume, pan, tag, priority);
     SDL_UnlockMutex(g_pWc1SdlDosMusicMutex);
     return result;
+}
+
+int Wc1SdlHandlesGameSoundEffects(void)
+{
+    return 1;
+}
+
+int Wc1SdlPlayGameSoundEffect(int soundNumber, int sourceObject, int looping)
+{
+    FixedVector delta;
+    long magnitude;
+    int scaledPan;
+    int stereoOffset;
+    int distance;
+    int volume;
+    int pan;
+
+    magnitude = 0;
+    pan = WC1_SDL_SOUND_CENTRE_PAN;
+    if (sourceObject != -1) {
+        if (sourceObject < 0 || sourceObject >= WC1_SPACE_OBJECT_COUNT)
+            return 0;
+        ComputeVectorDelta(
+            &aShipPosition[WC1_EYE_OBJECT],
+            &aShipPosition[sourceObject], &delta);
+        magnitude = Vector_magnitude(&delta);
+        NormalizeFixedVector(&delta);
+        stereoOffset = dot_product(
+            &delta, &aShipRightVector[WC1_EYE_OBJECT]);
+        scaledPan = stereoOffset * WC1_SDL_SOUND_CENTRE_PAN;
+        if (scaledPan < 0)
+            scaledPan = -((-scaledPan + 0xff) / 0x100);
+        else
+            scaledPan /= 0x100;
+        pan -= scaledPan;
+        if (pan < 0)
+            pan = 0;
+        else if (pan > 127)
+            pan = 127;
+    }
+
+    if (Wc1SdlUsingDosData()) {
+        volume = WC1_SDL_SOUND_FULL_VOLUME;
+        if (sourceObject != -1) {
+            volume -= (int)((magnitude /
+                             WC1_SDL_SOUND_METRES_PER_VOLUME_STEP) >> 8);
+        }
+        if (volume < 0)
+            volume = 0;
+        if (volume < WC1_SDL_SOUND_AUDIBLE_VOLUME)
+            return 0;
+        if (!Wc1SdlPlayDosSoundEffect(
+                soundNumber, volume, pan, sourceObject, looping))
+            return 0;
+        aiSoundEffectSourceActive[sourceObject + 1] = 1;
+        if (sourceObject == -1)
+            bAfterburnerSfxActive = soundNumber == 12;
+        return 1;
+    }
+
+    if (sourceObject != -1) {
+        distance = magnitude > 32000 ? 32000 : (int)magnitude;
+    } else {
+        distance = 32000;
+    }
+    if (distance < 10)
+        return 0;
+    aiSoundEffectSourceActive[sourceObject + 1] = 1;
+    sprintf(szSfxWavePath, szSfxWaveFormat, soundNumber - 1);
+    Wc1SdlPlayWaveWithPan(szSfxWavePath, looping, distance, pan);
+    return 1;
 }
 
 void Wc1SdlStopDosSoundEffects(void)
