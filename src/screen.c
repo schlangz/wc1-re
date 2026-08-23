@@ -418,7 +418,9 @@ void *PushMemoryStackFrame(void *memory, int offset)
     int index;
 
     if (offset != 0) {
+#if !defined(WC1_SDL) || defined(WC1_SDL_LEGACY_DEBUG_OUTPUT)
         printf("push %p by %d\n", memory, offset);
+#endif
         if (nPacketHandleCount == 0x1000)
             exit_squadron("qq mem push overflow");
         index = nPacketHandleCount;
@@ -1868,11 +1870,17 @@ void PrintPaletteAllocationMap(void)
     do {
         column = 0x40;
         do {
+#if !defined(WC1_SDL) || defined(WC1_SDL_LEGACY_DEBUG_OUTPUT)
             printf("%c", awPaletteEntryAllocation[index++] < 1 ?
                    '_' : '.');
+#else
+            index++;
+#endif
             column--;
         } while (column != 0);
+#if !defined(WC1_SDL) || defined(WC1_SDL_LEGACY_DEBUG_OUTPUT)
         printf("\n");
+#endif
         row--;
     } while (row != 0);
 }

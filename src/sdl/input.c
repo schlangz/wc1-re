@@ -186,8 +186,12 @@ int Wc1SdlGetAsyncKeyState(int virtualKey)
 
 void Wc1SdlOutputDebugString(const char *text)
 {
+#ifdef WC1_SDL_LEGACY_DEBUG_OUTPUT
     fputs(text, stderr);
     fflush(stderr);
+#else
+    (void)text;
+#endif
 }
 
 int Wc1SdlSetCursorPosition(int x, int y)

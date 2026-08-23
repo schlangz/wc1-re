@@ -171,7 +171,7 @@ void DestroyGlobalDebugOverlayConsole(void)
 /* Function start: 0x425BB0 */
 void SystemDebugPrintf(const char *format, ...)
 {
-#ifdef WC1_SDL
+#if defined(WC1_SDL) && defined(WC1_SDL_LEGACY_DEBUG_OUTPUT)
     va_list arguments;
 
     va_start(arguments, format);

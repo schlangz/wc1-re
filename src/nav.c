@@ -1706,8 +1706,10 @@ void __stdcall free_viewport(Viewport *viewport)
             ReleasePacketHandle(viewport->rowOffsets);
             viewport->rowOffsets = 0;
         }
+#if !defined(WC1_SDL) || defined(WC1_SDL_LEGACY_DEBUG_OUTPUT)
         if (nVideoMode != 0x13)
             printf("free_viewport not mcga\n");
+#endif
         ReleasePacketHandle(allocation);
         viewport->pixels = 0;
         viewport->allocation = 0;

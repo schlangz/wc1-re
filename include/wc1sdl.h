@@ -180,6 +180,8 @@ int Wc1SdlStartAudio(Wc1SdlAudioMixer mixer,
                      CRITICAL_SECTION *criticalSection,
                      unsigned int *tick);
 void Wc1SdlStopAudio(void);
+/* Windows developer-channel output stays off in the SDL2 port unless a
+ * diagnostic build defines WC1_SDL_LEGACY_DEBUG_OUTPUT. */
 void Wc1SdlOutputDebugString(const char *text);
 void Wc1SdlPumpEvents(void);
 void Wc1SdlSetMouseGrab(int enabled);
