@@ -235,11 +235,16 @@ void DrawFontGlyph(char character, TextContext *context, int height,
 
     abPaletteTranslation[fontColour] = colour;
     abPaletteTranslation[fontBackground] = background;
+#ifdef SDL_PORT
+    /* Packed fonts provide lookup entries for the complete byte range. */
+    characterIndex = (short)(unsigned char)character;
+#else
     characterIndex = (short)(signed char)character;
     if (characterIndex != 0x81 && characterIndex != 0x84 &&
         characterIndex != 0x8e && characterIndex != 0x94 &&
         characterIndex != 0x99 && characterIndex != 0x9a &&
         characterIndex != 0xe1) {
+#endif
         characterData = font + characterIndex;
         bitmapOffset = ((unsigned int)characterData[0x204] << 8) +
                        characterData[0x104];
@@ -281,7 +286,9 @@ void DrawFontGlyph(char character, TextContext *context, int height,
         context->cursorX += font[4 + characterIndex];
         abPaletteTranslation[fontColour] = fontColour;
         abPaletteTranslation[fontBackground] = fontBackground;
+#ifndef SDL_PORT
     }
+#endif
 }
 
 /* Function start: 0x441370 */

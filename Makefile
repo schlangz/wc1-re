@@ -137,7 +137,8 @@ MODERN_LZO_LIBS = $(shell pkg-config --libs lzo2 2>/dev/null)
 MODERN_CPPFLAGS = -DSDL_PORT=1 -DSDL_MAIN_HANDLED -Iinclude \
 	$(MODERN_SDL_CFLAGS) \
 	$(MODERN_LZO_CFLAGS) $(addprefix -I,$(MODERN_LZO_INCLUDEDIR))
-MODERN_TEST_CPPFLAGS = -DSDL_MAIN_HANDLED $(MODERN_SDL_CFLAGS)
+MODERN_TEST_CPPFLAGS = -DSDL_PORT=1 -DSDL_MAIN_HANDLED -Iinclude \
+	$(MODERN_SDL_CFLAGS)
 MODERN_CFLAGS ?= -O2 -std=c11 -Wno-return-type -Wno-return-mismatch \
 	-Wno-error=incompatible-pointer-types
 MODERN_CXXFLAGS ?= -O2 -std=c++11
@@ -415,14 +416,21 @@ MODERN_GAME_HOST_OBJS = \
 	$(patsubst src/%.cpp,$(MODERN_OUT_DIR)/obj/%.o,$(MODERN_GAME_HOST_CXX_SRCS)) \
 	$(MODERN_YMFM_OBJS)
 MODERN_LAUNCHER_OBJ = $(patsubst src/%.c,$(MODERN_OUT_DIR)/obj/%.o,$(MODERN_LAUNCHER_SRC))
-MODERN_TEST_BIN = $(MODERN_OUT_DIR)/tests/sdl_smoke$(MODERN_EXE_SUFFIX)
+MODERN_SMOKE_TEST_BIN = \
+	$(MODERN_OUT_DIR)/tests/sdl_smoke$(MODERN_EXE_SUFFIX)
+MODERN_TEXT_TEST_BIN = \
+	$(MODERN_OUT_DIR)/tests/sdl_text_compat$(MODERN_EXE_SUFFIX)
+MODERN_TEST_BINS = $(MODERN_SMOKE_TEST_BIN) $(MODERN_TEXT_TEST_BIN)
+MODERN_TEST_OBJS = \
+	$(MODERN_OUT_DIR)/tests/sdl_smoke.o \
+	$(MODERN_OUT_DIR)/tests/sdl_text_compat.o
 MODERN_DEPFILES = \
 	$(MODERN_GAMEPLAY_OBJS:.o=.d) \
 	$(MODERN_IX_OBJS:.o=.d) \
 	$(MODERN_BASE_HOST_OBJS:.o=.d) \
 	$(MODERN_GAME_HOST_OBJS:.o=.d) \
 	$(MODERN_LAUNCHER_OBJ:.o=.d) \
-	$(MODERN_OUT_DIR)/tests/sdl_smoke.d
+	$(MODERN_TEST_OBJS:.o=.d)
 
 # ---------------------------------------------------------------------------
 # Build targets and tool bootstrap
@@ -512,13 +520,28 @@ $(MODERN_TARGET): \
 		$(MODERN_PLATFORM_LIBS) \
 		$(MODERN_DEAD_STRIP_FLAGS) -o $@
 
-$(MODERN_TEST_BIN): $(MODERN_OUT_DIR)/tests/sdl_smoke.o
+$(MODERN_SMOKE_TEST_BIN): $(MODERN_OUT_DIR)/tests/sdl_smoke.o
 	$(MODERN_CC) $(MODERN_CFLAGS) $(MODERN_SANITIZER_FLAGS) \
 		$^ $(MODERN_SDL_LIBS) -o $@
 
-modern-test: $(MODERN_TEST_BIN)
-	@echo "Running $(MODERN_TEST_BIN)"
-	@SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy $(MODERN_TEST_BIN)
+$(MODERN_TEXT_TEST_BIN): \
+		$(MODERN_OUT_DIR)/tests/sdl_text_compat.o \
+		$(MODERN_BASE_HOST_OBJS) \
+		$(MODERN_GAME_HOST_OBJS) \
+		$(MODERN_GAMEPLAY_OBJS) \
+		$(MODERN_IX_OBJS)
+	$(MODERN_CXX) $(MODERN_CXXFLAGS) $(MODERN_SANITIZER_FLAGS) \
+		$^ $(MODERN_SDL_LIBS) $(MODERN_LZO_LIBS) \
+		$(MODERN_PLATFORM_LIBS) \
+		$(MODERN_DEAD_STRIP_FLAGS) -o $@
+
+modern-test: $(MODERN_TEST_BINS)
+	@echo "Running $(MODERN_SMOKE_TEST_BIN)"
+	@SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
+		$(MODERN_SMOKE_TEST_BIN)
+	@echo "Running $(MODERN_TEXT_TEST_BIN)"
+	@SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
+		$(MODERN_TEXT_TEST_BIN)
 
 run-modern: modern
 	@case "$(MODERN_RUN_DIR)" in \
