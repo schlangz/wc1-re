@@ -44,23 +44,23 @@ The Ghidra-exported disassembly is in `code-full`. The reimplementation lives in
 - DO NOT show the final code once you finish.
 - If you are out of ideas, stop. Do not break any rules.
 - In C++ (`src/ix`), do not use `this->`; use the class field name directly.
-- When a funciton is implemented, it should have a good name. No completely generic names are acceptable, so you must investigate globals and such to understand how to name them.
+- When a function is implemented, it should have a good name. No completely generic names are acceptable, so you must investigate globals and such to understand how to name them.
 - When a new .c file is added, it should have a good name. No leafsX.c are accepted.
 - Do NOT put a function in only one line `unsigned short f(void) { return 0; }`. The
   reconstruction is read side by side with the disassembly, so one source line per statement
   is what makes the two comparable. `make sort` fails if any remain;
   `bin/expandOneLiners.py` rewrites them.
-- DO NOT uses aliases, rename instead. In particular, do not use aliases for globals (#define g_X_Y ((void *)DAT_Y)). Instead rename all of them with a proper type.
+- DO NOT use aliases; rename instead. In particular, do not use aliases for globals (#define g_X_Y ((void *)DAT_Y)). Instead rename all of them with a proper type.
 - Do NOT manually replicate thunk functions or other compiler generated glue code (e.g. GetFixedOneMillionThunkAlt(void) { __asm { jmp GetFixedOneMillionAlt }). These need to be produced by the compiler automatically, not forced.
 
 ### WC1-specific rules that differ from sibling projects
 
 - **`.c` files are correct here.** The game core was C — the leaked WINGLEADER main module is
-  a `.c` file including `<game.h>` and `<dos.h>`. Only `src/ix/*` is C++. Do not "upgrade"
-  game-core files to C++ or to classes.
-- **Never add C++ exception handling.** The image contains no `__CxxFrameHandler` and no RTTI
-  type descriptors (`.?AV`), so `/GX` was off. The SEH that does exist is C `__try`-style
-  `_except_handler3` scope tables emitted by the compiler; do not write it by hand.
+  a `.c` file including `<game.h>` and `<dos.h>`. Preserve only the proven C++ exceptions
+  documented in `docs/COMPILER.md`; do not "upgrade" other core files to C++ or to classes.
+- **Never write C++ exception handling.** `/GX` is off except for the proven compiler-generated
+  construction cleanup in `pilot.cpp`; do not add `try`/`catch`. The remaining SEH is C
+  `_except_handler3` scope-table output and must not be written by hand either.
 - **Do not rely on identical string literals being merged.** `/Gf` was NOT used: two
   byte-identical `"DIBsetWholePalette   SetEntries"` literals exist at `0x0046b6e0` and
   `0x0046b71c`. Write each literal out at its own use site.
@@ -71,8 +71,8 @@ The Ghidra-exported disassembly is in `code-full`. The reimplementation lives in
 - Global variables may be renamed from `DAT_x` to `<hungarian><Name>` -- no `g_` prefix and
   no address in the name, so use sites read cleanly. The address MUST survive as a
   `/* 0x004xxxxx */` comment on the declaration in `include/globals.h` and on the
-  definition, which is what the layout audits resolve it from. `bin/stripGlobalAddresses.py`
-  does both. Unidentified globals keep `DAT_<address>` -- the address is all they have.
+  definition, which is what the layout audits resolve it from. Unidentified globals keep
+  `DAT_<address>` -- the address is all they have.
   Functions must NOT carry the address in their name.
 - A file that defines globals must not put a bare `0x004xxxxx` in its header comment: it
   outranks the first declaration's own address comment when the audit resolves it.

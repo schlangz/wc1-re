@@ -1,134 +1,50 @@
 # SDL2 port
 
-The SDL2 target is a native host for the reconstructed game. It reuses the game
-logic, resource loaders, event queue, indexed framebuffer, and `ix` audio API.
-Platform code is selected with `WC1_SDL` and must not alter the MSVC 4.20
-reference build or its binary comparisons.
+The native target reuses the reconstructed game and `ix` audio library.
+`src/sdl/` owns host windows, input, timing, paths, audio, and presentation;
+native objects stay under `out-modern/` and never enter the MSVC comparison
+build.
 
-## Port boundary
+The game still renders a 320x200 indexed frame. Both backends present it in a
+centered 4:3 viewport and use that viewport for pointer mapping. `--enhanced`
+selects the optional OpenGL 3.2 space-object renderer; the original software
+path remains the default and fallback.
 
-- `src/sdl/` owns windows, input translation, timing, host audio, paths, and
-  video presentation.
-- SDL input is converted to the game's existing scan codes and event queue;
-  gameplay code does not consume SDL events directly.
-- The game still renders a 320x200 indexed framebuffer and 256-colour palette.
-- Both video backends present it in a centered 4:3 viewport and map mouse input
-  through that same viewport.
-- Port-only state remains in SDL files. Original-address globals keep their
-  reconstructed types and ownership.
-- Native objects live under `out-modern/` and never enter `WC1.EXE` or
-  `binary-comp` comparisons.
+Kilrathi Saga data is fully supported. DOS support includes compressed packet
+resources, `MUSIC.MID`, `WINGLDR.TIM`, AdLib music, and synthesized OriginFX
+effects. In-flight sampled and synthesized effects use camera-relative stereo
+panning; synthesized effects retain distance falloff.
 
-Normal native development builds are compiled with AddressSanitizer and
-UndefinedBehaviorSanitizer. A sanitizer report is a port bug, even when the
-original executable happened to tolerate the same memory access. Release
-archives use `MODERN_RELEASE=1` to omit sanitizer instrumentation.
-
-## Game data and audio
-
-Kilrathi Saga data is the primary supported data set. DOS game-data support is
-partial: compressed packet resources, `MUSIC.MID`, `WINGLDR.TIM`, AdLib music,
-and synthesized OriginFX sound effects are supported, while other DOS-specific
-data or behavior may not be.
-
-The DOS release describes sound effects as compact OriginFX command records,
-not sampled WAV or VOC files. The SDL host interprets those records and mixes
-their YM3812 output with music in the existing audio callback.
-
-In flight, both the sampled Kilrathi Saga effects and synthesized DOS effects
-use left/right pan derived from the source's direction relative to the current
-camera. Synthesized DOS effects also retain the recovered distance falloff.
-
-## Enhanced renderer
-
-`--enhanced` selects the optional OpenGL 3.2 renderer. It records the ordered
-space-object layer and redraws it at output resolution with sharp-bilinear
-sampling. Ships, missiles, mines, projectiles, asteroids, debris, explosions,
-stars, planets, the intro logo, and launch-bay doors use this path. The cockpit,
-HUD, text, palette effects, and other screens remain in the indexed base frame.
-
-The default renderer always uses the original software drawing path. If the
-enhanced renderer cannot record an object, that object also falls back to the
-software path. Renderer-specific OpenGL state stays in `src/sdl/`; recovered
-game files expose only narrow `WC1_SDL` hooks.
+Development builds use ASan and UBSan. Release builds select
+`MODERN_RELEASE=1`.
 
 ## Joystick input
 
-The default `--joystick-mode=original` mode preserves the original X/Y and
-two-button controls. SDL's mapped controller interface supplies the left stick
-and A/B buttons on recognized gamepads. Other devices use their first two axes
-and buttons. Device removal and reconnection are handled without restarting the
-port.
+`--joystick-mode=original` preserves the original two-axis, two-button layout.
+The `4button-2axis` and `4button-4axis` modes add WCAT-style controls. The
+four-axis mode accepts:
 
-The optional WCAT-style modes give each action its own button. On mapped
-gamepads, buttons 1–4 are A/B/X/Y:
-
-| Mode | Buttons 1–4 |
+| `--joystick-axes=` | Extra-axis behavior |
 | --- | --- |
-| `--joystick-mode=4button-2axis` | Fire, missile, afterburner, roll/throttle modifier |
-| `--joystick-mode=4button-4axis` | Fire, missile, afterburner, cycle target |
+| `twin-stick-roll` | Extra X rolls; extra Y is relative throttle |
+| `twin-stick-yaw` | Extra X yaws; extra Y is relative throttle |
+| `hotas-yaw` | Primary X rolls; rudder yaws; final axis is throttle |
+| `hotas-roll` | Primary X yaws; rudder rolls; final axis is throttle |
+| `linear-throttle` | Third axis is throttle; keyboard controls roll |
+| `rudder-yaw` | Third axis yaws |
+| `rudder-roll` | Third axis rolls |
 
-The four-axis mode reads the mapped right stick, raw axes 3/4, or the X/Y axes
-of a second joystick. Its default axis layout is `twin-stick-roll`; select a
-different layout with `--joystick-axes=<layout>`:
+Use `--joystick-debug` for event diagnostics and `--joystick-rumble` for
+supported feedback. The README documents the common controller bindings.
 
-| Layout | Horizontal and extra axes |
-| --- | --- |
-| `twin-stick-roll` | Primary X yaws; extra X rolls; extra Y is relative throttle |
-| `twin-stick-yaw` | Primary X rolls; extra X yaws; extra Y is relative throttle |
-| `hotas-yaw` | Primary X rolls; rudder yaws; final axis is linear throttle |
-| `hotas-roll` | Primary X yaws; rudder rolls; final axis is linear throttle |
-| `linear-throttle` | Primary X yaws; third axis is linear throttle; keyboard controls roll |
-| `rudder-yaw` | Primary X rolls; third axis yaws |
-| `rudder-roll` | Primary X yaws; third axis rolls |
-
-Primary Y always controls pitch. Directional extra axes use a 25-percent
-deadzone. For example:
-
-```sh
-./wc1-modern --joystick-mode=4button-4axis \
-  --joystick-axes=hotas-yaw
-```
-
-Add `--joystick-debug` to print the detected device type and each joystick
-axis, button, and hat event to the terminal.
-
-Add `--joystick-rumble` to enable gentle heavy-weapon, damage, collision, and
-afterburner feedback on supported controllers and force-feedback joysticks. It
-is disabled by default; devices without rumble support continue without
-feedback.
-
-Gamepad Start pauses and resumes during spaceflight, Back acts as Escape, and
-the Y face button answers Yes at `Y/N` prompts. Mapped SDL controllers use
-their named buttons. Both WCAT-style modes also provide these spaceflight
-bindings:
-
-The four primary actions map to A/B/X/Y: fire guns, fire the selected release
-weapon, hold afterburner, and the mode-specific fourth action.
-
-| Control | Action |
-| --- | --- |
-| LB | Cycle guns |
-| RB | Cycle missiles and other release weapons |
-| LT or left-stick click | Navigation display; press again to open the map |
-| RT or right-stick click | Autopilot |
-| D-pad Up / Down | Full speed / stop |
-| D-pad Left / Right | Communications / target lock |
-
-While the communications list is open, D-pad Up/Down moves the highlighted
-choice, Right selects it, and Left closes the list. The flight sticks and
-A/B/X/Y actions remain active while choosing a response.
-
-The raw 12-button fallback uses buttons 5/6 for LB/RB, 7/8 for LT/RT, 9/10
-for Back/Start, 11/12 for the stick clicks, and the first hat for the D-pad.
-
-## Development commands
+## Commands
 
 ```sh
 make modern
+make modern-test
 make run-modern
 make run-modern-dos
 make run-modern-mission SERIES=1 MISSION=0
 ```
 
-`make modern-test` runs a data-free SDL2 initialization smoke check.
+`modern-test` is a data-free SDL2 initialization smoke check.

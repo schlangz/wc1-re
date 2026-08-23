@@ -16,7 +16,6 @@
 #   make report          # per-function similarity report
 #   make order           # compilation-unit boundary hints
 #   make verify          # primary recovery verification checklist
-#   make progress        # reimplementation progress summary
 
 # ---------------------------------------------------------------------------
 # Original toolchain
@@ -435,8 +434,7 @@ build: $(TARGET)
 
 # Naming parity with the sibling project, which has separate full/demo builds.
 # WC1 shipped no demo, so there is only one target here and the `*-demo`
-# counterparts (build-demo, report-demo, seh-demo, compare-demo, run-demo,
-# progress-demo) intentionally do not exist.
+# counterparts intentionally do not exist.
 build-full: $(TARGET)
 
 # The native port is deliberately built in a separate output tree.  It must
@@ -665,9 +663,6 @@ audit-addresses:
 audit-compiler-glue:
 	@python3 bin/auditCompilerGlue.py
 
-progress:
-	@python3 bin/showProgress.py
-
 $(GLOBALS_AUDIT_SOURCE): bin/collectGlobalDefinitions.py include/wcdata.h $(GLOBALS_DEFINITION_SOURCES)
 	@python3 bin/collectGlobalDefinitions.py \
 		--output $@ \
@@ -687,9 +682,7 @@ compare-func: $(TARGET) $(GLOBALS_AUDIT_SOURCE) | code-full $(ORIGINAL_EXE)
 	test -n "$$f" || (echo "no export for $(FUNC) in $(CODE_DIR)/ -- run 'make export-asm'" >&2 && exit 1); \
 	$(BINARY_COMP) compare $(BC) --no-build $(FUNC) "$$f"
 
-# Regenerate code-full/ straight from the original PE with Capstone.  Preferred
-# over scraping Ghidra; bin/exportGhidra.py remains for names Ghidra knows and
-# the PE does not.
+# Regenerate code-full/ straight from the original PE with Capstone.
 export-asm: | $(ORIGINAL_EXE)
 	@$(BINARY_COMP) export-asm $(BC) $(EXPORT_ASM_FLAGS)
 
@@ -940,7 +933,6 @@ clean-modern:
 	modern-check-sdl \
 	modern-test \
 	order \
-	progress \
 	report \
 	run \
 	run-check \
