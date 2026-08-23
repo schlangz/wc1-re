@@ -661,7 +661,7 @@ void sort_object_depth(void)
     memset(anObjectDepthPlaced, 0,
            sizeof(anObjectDepthPlaced));
     obj = 0;
-    for (; obj < WC1_SPACE_OBJECT_COUNT; obj++) {
+    for (; obj < SPACE_OBJECT_COUNT; obj++) {
         distance = (unsigned short)asObjectDistance[obj];
         if (previous < (int)distance) {
             previous = (int)distance;
@@ -670,7 +670,7 @@ void sort_object_depth(void)
     }
     sorted = 0;
     sortedEntry = anSortedObject;
-    for (; sorted < WC1_SPACE_OBJECT_COUNT; sorted++, sortedEntry++) {
+    for (; sorted < SPACE_OBJECT_COUNT; sorted++, sortedEntry++) {
         best = -1;
         *sortedEntry = bestObject;
         if (bestObject == -1)
@@ -681,7 +681,7 @@ void sort_object_depth(void)
         bestObject = -1;
         placed = anObjectDepthPlaced;
         for (; placed < anObjectDepthPlaced +
-                           WC1_SPACE_OBJECT_COUNT;
+                           SPACE_OBJECT_COUNT;
              screenOffset += sizeof(short), placed++, obj++) {
             if (*placed == 0 &&
                 *(short *)((unsigned char *)asObjectScreenX +
@@ -708,7 +708,7 @@ void draw_sorted_objects_to_buffer(void)
     short screenX;
     short screenY;
     int specialObject;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     float enhancedScreenX;
     float enhancedScreenY;
     short projectedScreenX;
@@ -723,7 +723,7 @@ void draw_sorted_objects_to_buffer(void)
         if ((int)aeObjectType[obj] < 0)
             return;
         objectClass = aeObjectClass[obj];
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         enhancedScreenX = (float)(short)(
             asObjectScreenX[obj] + nViewCenterX);
         enhancedScreenY = (float)(short)(
@@ -757,7 +757,7 @@ void draw_sorted_objects_to_buffer(void)
             }
         } else if (objectClass == OBJECT_CLASS_FIXED_OBJECT &&
                    aeObjectType[obj] == OBJECT_TYPE_THRUSTERS) {
-            Wc1SdlGetThrusterScreenPosition(
+            SdlGetThrusterScreenPosition(
                 (short)obj, &enhancedScreenX, &enhancedScreenY);
         }
 #endif
@@ -772,8 +772,8 @@ void draw_sorted_objects_to_buffer(void)
                 screenY = (short)(screenY + nViewCenterY);
                 asObjectDrawY[obj] = screenY;
                 if (shape != 0) {
-#ifdef WC1_SDL
-                    if (!Wc1SdlRecordSpaceSprite(
+#ifdef SDL_PORT
+                    if (!SdlRecordSpaceSprite(
                             &stSpaceBuffer, enhancedScreenX, enhancedScreenY,
                             shape,
                             asObjectViewFrame[obj],
@@ -790,7 +790,7 @@ void draw_sorted_objects_to_buffer(void)
                 }
                 break;
             case OBJECT_CLASS_STAR:
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 /* WCDX fix: planets use the per-object scaled path above. */
 #else
             case OBJECT_CLASS_PLANET:
@@ -807,8 +807,8 @@ void draw_sorted_objects_to_buffer(void)
                     shape = apObjectShape[obj];
                 else
                     shape = pConstellationShape;
-#ifdef WC1_SDL
-                if (!Wc1SdlRecordSpaceSprite(
+#ifdef SDL_PORT
+                if (!SdlRecordSpaceSprite(
                         &stSpaceBuffer, enhancedScreenX,
                         enhancedScreenY, shape,
                         asObjectViewFrame[obj], 0, 0x100, 0))
@@ -820,7 +820,7 @@ void draw_sorted_objects_to_buffer(void)
         }
         sortedEntry++;
     } while (sortedEntry < anSortedObject +
-                           WC1_SPACE_OBJECT_COUNT);
+                           SPACE_OBJECT_COUNT);
 }
 
 /* Function start: 0x436650 */
@@ -837,7 +837,7 @@ void intro_drawbackgroundships(void)
     shortOffset = 0;
     zero = 0;
     dwordOffset = 0;
-    for (; dwordOffset < WC1_SPACE_OBJECT_COUNT * (int)sizeof(int);
+    for (; dwordOffset < SPACE_OBJECT_COUNT * (int)sizeof(int);
          shortOffset += sizeof(short),
          dwordOffset += sizeof(int),
          obj++) {
@@ -849,7 +849,7 @@ void intro_drawbackgroundships(void)
         if (objectClass != OBJECT_CLASS_NULL) {
             switch (objectClass) {
             default:
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 shape = apObjectShape[obj];
 #else
                 shape = *(unsigned char **)(
@@ -876,14 +876,14 @@ void intro_drawbackgroundships(void)
                 }
                 break;
             case OBJECT_CLASS_STAR:
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 /* Erase planets with the same scaled geometry used to draw. */
 #else
             case OBJECT_CLASS_PLANET:
 #endif
             case OBJECT_CLASS_DUST:
                 if (obj == nNavPointerObject)
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                     shape = apObjectShape[obj];
 #else
                     shape = *(unsigned char **)(

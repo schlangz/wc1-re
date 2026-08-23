@@ -20,8 +20,8 @@
  *  a 0x1F-byte stride against the 77-byte disk nav record -- so a disk field
  *  offset is a hint about what exists, never about where it lives at runtime.
  */
-#ifndef WC1_DATA_H
-#define WC1_DATA_H
+#ifndef GAME_DATA_H
+#define GAME_DATA_H
 
 #include <stddef.h>
 
@@ -312,16 +312,16 @@ enum CommMenuEntry {
  * Coordinates are 3-byte little-endian signed: uint16 low word plus uint8 high
  * byte, minus 16777216 when the high byte is >= 128.
  * -------------------------------------------------------------------------- */
-#define WC1_NAV_RECORD_BYTES   77
-#define WC1_SHIP_RECORD_BYTES  42
-#define WC1_MAP_RECORD_BYTES   64
+#define NAV_RECORD_BYTES   77
+#define SHIP_RECORD_BYTES  42
+#define MAP_RECORD_BYTES   64
 
 typedef struct FixedVector {
     int x;
     int y;
     int z;
 }
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 __attribute__((packed))
 #endif
 FixedVector;
@@ -397,7 +397,7 @@ typedef struct ObjectTypeData {
 } ObjectTypeData;
 #pragma pack(pop)
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 typedef char ObjectTypeData_size_must_be_0x87[
     sizeof(ObjectTypeData) == 0x87 ? 1 : -1];
 typedef char ObjectTypeData_objectClass_must_be_at_0x04[
@@ -535,7 +535,7 @@ typedef struct NavMapLabel {
 } NavMapLabel;
 #pragma pack(pop)
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 typedef char NavMapLabel_size_must_be_0x0a[
     sizeof(NavMapLabel) == 0x0a ? 1 : -1];
 #endif
@@ -549,7 +549,7 @@ typedef struct NavMapObjectiveStyle {
     unsigned char *labelColour;
 } NavMapObjectiveStyle;
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 typedef char NavMapObjectiveStyle_size_must_be_0x10[
     sizeof(NavMapObjectiveStyle) == 0x10 ? 1 : -1];
 #endif
@@ -564,13 +564,13 @@ typedef struct TitleMenuRegion {
 } TitleMenuRegion;
 
 /* One packet-backed pointer slot in a scene resource list. */
-#ifdef WC1_SDL
-typedef unsigned char *Wc1PackedResourcePointer
+#ifdef SDL_PORT
+typedef unsigned char *PackedResourcePointer
     __attribute__((aligned(1)));
 #endif
 typedef struct PacketResourceDescriptor {
-#ifdef WC1_SDL
-    Wc1PackedResourcePointer *resource;
+#ifdef SDL_PORT
+    PackedResourcePointer *resource;
 #else
     unsigned char **resource;
 #endif
@@ -761,7 +761,7 @@ typedef struct PacketSectionHandle {
 
 typedef char PilotRecord_size_must_be_0x26[
     sizeof(PilotRecord) == 0x26 ? 1 : -1];
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 typedef char CampaignState_size_must_be_0x58[
     sizeof(CampaignState) == 0x58 ? 1 : -1];
 #endif
@@ -769,7 +769,7 @@ typedef char SaveGameDiskCampaignState_size_must_be_0x44[
     sizeof(SaveGameDiskCampaignState) == 0x44 ? 1 : -1];
 typedef char ConversationSceneRecord_size_must_be_0x0d[
     sizeof(ConversationSceneRecord) == 0x0d ? 1 : -1];
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 typedef char BriefingCharacterLayout_size_must_be_0x12[
     sizeof(BriefingCharacterLayout) == 0x12 ? 1 : -1];
 typedef char SceneAnimationObject_size_must_be_0x36[
@@ -987,19 +987,19 @@ typedef struct BarracksAnimationState {
 
 typedef char MissionNavPoint_size_must_be_0x51[
     sizeof(MissionNavPoint) == 0x51 ? 1 : -1];
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 typedef char MissionShipRecord_size_must_be_0x36[
     sizeof(MissionShipRecord) == 0x36 ? 1 : -1];
 #endif
 typedef char MissionObjectiveSource_size_must_be_0x42[
     sizeof(MissionObjectiveSource) == 0x42 ? 1 : -1];
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 typedef char MissionObjective_size_must_be_0x1f[
     sizeof(MissionObjective) == 0x1f ? 1 : -1];
 #endif
 typedef char SaveGameDiskObjective_size_must_be_0x19[
     sizeof(SaveGameDiskObjective) == 0x19 ? 1 : -1];
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 typedef char SaveGameRecord_size_must_be_0x3b0[
     sizeof(SaveGameRecord) == 0x3b0 ? 1 : -1];
 #endif
@@ -1007,22 +1007,22 @@ typedef char SaveGameDiskRecord_size_must_be_0x33c[
     sizeof(SaveGameDiskRecord) == 0x33c ? 1 : -1];
 typedef char BarracksBunkState_size_must_be_0x0a[
     sizeof(BarracksBunkState) == 0x0a ? 1 : -1];
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 typedef char BarracksAnimationState_size_must_be_0x68[
     sizeof(BarracksAnimationState) == 0x68 ? 1 : -1];
 #endif
 
-#define WC1_SPACE_OBJECT_COUNT 64
-#define WC1_SPACE_LAST_MOVING_OBJECT 60
-#define WC1_EYE_OBJECT 61
-#define WC1_DIRECTION_VIEW_COUNT 62
-#define WC1_DIRECTION_SHAPE_TABLE_COUNT 3
-#define WC1_MISSION_SHIP_STORAGE_COUNT 48
-#define WC1_MISSION_SHIP_SCAN_LIMIT 64
-#define WC1_ACTIVE_MISSION_SHIP_COUNT 32
-#define WC1_MISSION_NAV_POINT_COUNT 20
-#define WC1_ACTIVE_MISSION_NAV_POINT_COUNT 16
-#define WC1_MISSION_OBJECTIVE_COUNT 16
+#define SPACE_OBJECT_COUNT 64
+#define SPACE_LAST_MOVING_OBJECT 60
+#define EYE_OBJECT 61
+#define DIRECTION_VIEW_COUNT 62
+#define DIRECTION_SHAPE_TABLE_COUNT 3
+#define MISSION_SHIP_STORAGE_COUNT 48
+#define MISSION_SHIP_SCAN_LIMIT 64
+#define ACTIVE_MISSION_SHIP_COUNT 32
+#define MISSION_NAV_POINT_COUNT 20
+#define ACTIVE_MISSION_NAV_POINT_COUNT 16
+#define MISSION_OBJECTIVE_COUNT 16
 
 /* --------------------------------------------------------------------------
  * Pilot record field order, from the DOS build's live memory layout
@@ -1039,4 +1039,4 @@ typedef char BarracksAnimationState_size_must_be_0x68[
  * cheat flag is set (see ReadCheaterFlagFromRegistry, 0x00442600).
  * -------------------------------------------------------------------------- */
 
-#endif /* WC1_DATA_H */
+#endif /* GAME_DATA_H */

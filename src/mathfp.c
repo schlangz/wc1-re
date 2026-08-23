@@ -61,13 +61,13 @@ long DivideFixed(int numerator, int denominator)
 /* Function start: 0x434E00 */
 long SinFixed(short degrees)
 {
-    return (long)(sin((double)degrees * WC1_DEG2RAD) * 256.0);
+    return (long)(sin((double)degrees * DEGREES_TO_RADIANS) * 256.0);
 }
 
 /* Function start: 0x434E30 */
 long CosFixed(short degrees)
 {
-    return (long)(cos((double)degrees * WC1_DEG2RAD) * 256.0);
+    return (long)(cos((double)degrees * DEGREES_TO_RADIANS) * 256.0);
 }
 
 /* Function start: 0x434E60 */
@@ -169,7 +169,7 @@ short __stdcall GetShapeFrameBounds(short *bounds, short x, short y,
                                     unsigned char *shape, short frame)
 {
     short frameTableOffset;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     short frameData[4];
 #else
     short *frameData;
@@ -178,7 +178,7 @@ short __stdcall GetShapeFrameBounds(short *bounds, short x, short y,
     frameTableOffset = (short)(frame * 4);
     if ((int)frameTableOffset < (int)*(unsigned short *)(shape + 4)) {
         frameTableOffset = (short)(frameTableOffset + 4);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         memcpy(frameData,
                shape + *(unsigned short *)(shape + frameTableOffset),
                sizeof(frameData));

@@ -76,7 +76,7 @@ extern "C" int ix_streamer_init(void)
 }
 
 /* Function start: 0x0044286F */   /* source line(s) 87: Streamer not ready for destroy */
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 extern "C"
 #endif
 void ix_streamer_destroy(void)
@@ -90,7 +90,7 @@ void ix_streamer_destroy(void)
         ix_streamer_close_stream_file();
     dwStreamerState |= IX_STREAMER_SHUTDOWN;
     SetEvent(hStreamerWakeEvent);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     WaitForSingleObject(hStreamerThread, INFINITE);
     CloseHandle(hStreamerThread);
     hStreamerThread = 0;
@@ -103,7 +103,7 @@ void ix_streamer_destroy(void)
     DeleteCriticalSection(&csStreamerThread);
     ix_dsp_shutdown();
     dwStreamerState &= ~IX_STREAMER_INITIALIZED;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     dwStreamerState &=
         ~(IX_STREAMER_SHUTDOWN | IX_STREAMER_THREAD_RUNNING);
 #endif

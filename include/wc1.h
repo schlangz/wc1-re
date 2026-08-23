@@ -18,15 +18,15 @@
  *  original used a 16-bit type produces 32-bit operations and breaks the
  *  instruction comparison -- see AGENTS.md.
  */
-#ifndef WC1_H
-#define WC1_H
+#ifndef GAME_H
+#define GAME_H
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 #include "wc1sdl.h"
 #endif
 
-#ifndef WC1_ANALYSIS
-#ifndef WC1_SDL
+#ifndef ANALYSIS_BUILD
+#ifndef SDL_PORT
 #include <windows.h>
 #include <ddraw.h>
 #include <mmsystem.h>
@@ -47,7 +47,7 @@
 
 /* Degrees are the angular unit throughout the game core (the constant lives at
  * DAT_004631b0 in the original); the trig shims convert on the way in. */
-#define WC1_DEG2RAD 0.017453292519943295
+#define DEGREES_TO_RADIANS 0.017453292519943295
 
 /* The DirectDraw back end uses this release-and-clear shape for its surfaces. */
 #define COM_RELEASE(surface) \
@@ -96,15 +96,15 @@ typedef struct Viewport {
     unsigned char *allocation;      /* +0x10 */
 } Viewport;
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 /* The original rasterisers form this pointer before applying their vertical
  * clip. Avoid an otherwise unused out-of-range table read under sanitizers. */
-#define WC1_SPRITE_ROW_OFFSET(viewport, row) \
+#define SPRITE_ROW_OFFSET(viewport, row) \
     ((row) < (viewport)->top || (row) > (viewport)->bottom \
          ? 0 \
          : (viewport)->rowOffsets[row])
 #else
-#define WC1_SPRITE_ROW_OFFSET(viewport, row) viewport->rowOffsets[row]
+#define SPRITE_ROW_OFFSET(viewport, row) viewport->rowOffsets[row]
 #endif
 
 /* The event manager snapshots these 28 bytes with seven MOVSD operations.
@@ -127,7 +127,7 @@ typedef struct MouseCursorState {
 } MouseCursorState;
 #pragma pack(pop)
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 typedef char MouseCursorState_size_must_be_0x1c[
     sizeof(MouseCursorState) == 0x1c ? 1 : -1];
 #endif
@@ -209,7 +209,7 @@ typedef struct RLEFrameHeader {
     int right;
     int bottom;
 }
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 __attribute__((packed))
 #endif
 RLEFrameHeader;
@@ -275,7 +275,7 @@ typedef struct HudMessageSlot {
 } HudMessageSlot;
 #pragma pack(pop)
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 typedef char CockpitReadout_size_must_be_0x0a[
     sizeof(CockpitReadout) == 0x0a ? 1 : -1];
 #endif
@@ -357,7 +357,7 @@ typedef struct DebugOverlayConsole {
  * different base type.  The Win32 port therefore has to be using the windows.h
  * one, so do not redeclare it here.  TRUE/FALSE likewise come from windows.h.
  */
-#if defined(WC1_ANALYSIS) && !defined(WC1_SDL)
+#if defined(ANALYSIS_BUILD) && !defined(SDL_PORT)
 typedef unsigned char BOOLEAN;
 #ifndef TRUE
 #define FALSE 0
@@ -396,7 +396,7 @@ void ShowOnScreenMessage(int flags, short duration, const char *fmt, ...);
 void SoundDebugPrintf(const char *fmt, ...);   /* 0x00403DB0 */
 void SystemDebugPrintf(const char *fmt, ...);  /* 0x00425BB0 */
 
-#ifndef WC1_ANALYSIS
+#ifndef ANALYSIS_BUILD
 #include "wcdata.h"
 #include "globals.h"
 #include "wc1funcs.h"
@@ -407,4 +407,4 @@ void SystemDebugPrintf(const char *fmt, ...);  /* 0x00425BB0 */
 }
 #endif
 
-#endif /* WC1_H */
+#endif /* GAME_H */

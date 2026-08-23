@@ -84,7 +84,7 @@ BOOL QueryPerformanceCounter(LARGE_INTEGER *counter)
 
 BOOL SetCurrentDirectoryA(const char *path)
 {
-    return Wc1SdlChangeDirectory(path) == 0;
+    return SdlChangeDirectory(path) == 0;
 }
 
 BOOL TextOutA(HDC dc, int x, int y, const char *text, int length)
@@ -120,12 +120,12 @@ void LeaveCriticalSection(CRITICAL_SECTION *criticalSection)
     SDL_UnlockMutex(criticalSection->mutex);
 }
 
-DWORD Wc1SdlGetTicks(void)
+DWORD SdlGetTicks(void)
 {
     return SDL_GetTicks();
 }
 
-int Wc1SdlGetAsyncKeyState(int virtualKey)
+int SdlGetAsyncKeyState(int virtualKey)
 {
     const Uint8 *keys;
     SDL_Scancode scanCode;
@@ -184,9 +184,9 @@ int Wc1SdlGetAsyncKeyState(int virtualKey)
     return keys[scanCode] ? 0x8000 : 0;
 }
 
-void Wc1SdlOutputDebugString(const char *text)
+void SdlOutputDebugString(const char *text)
 {
-#ifdef WC1_SDL_LEGACY_DEBUG_OUTPUT
+#ifdef SDL_PORT_LEGACY_DEBUG_OUTPUT
     fputs(text, stderr);
     fflush(stderr);
 #else
@@ -194,7 +194,7 @@ void Wc1SdlOutputDebugString(const char *text)
 #endif
 }
 
-int Wc1SdlSetCursorPosition(int x, int y)
+int SdlSetCursorPosition(int x, int y)
 {
     SDL_Window *window;
     int windowX;
@@ -205,14 +205,14 @@ int Wc1SdlSetCursorPosition(int x, int y)
         window = SDL_GetMouseFocus();
     if (window == 0)
         return FALSE;
-    if (!Wc1SdlMapLogicalToWindow(
+    if (!SdlMapLogicalToWindow(
             window, x, y, &windowX, &windowY))
         return FALSE;
     SDL_WarpMouseInWindow(window, windowX, windowY);
     return TRUE;
 }
 
-void Wc1SdlSleep(DWORD milliseconds)
+void SdlSleep(DWORD milliseconds)
 {
     SDL_Delay(milliseconds);
 }

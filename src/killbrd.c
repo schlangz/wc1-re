@@ -695,7 +695,7 @@ void CheckHeapBlockSignature(unsigned char *shape)
 /* Function start: 0x4408C0 */
 unsigned char *GetPreparedShapeData(unsigned char *shape)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     return *(unsigned char **)(shape - 8 - sizeof(unsigned char *));
 #else
     return *(unsigned char **)(shape - 4);
@@ -715,20 +715,20 @@ void GetShapeFrameExtents(unsigned char *shape, short frame,
                           short *leftExtent, short *topExtent)
 {
     int rightExtent;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     short *frameHeader;
 #endif
     int frameOffset;
     int left;
     int top;
     int bottom;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     short frameExtents[4];
 #endif
 
     frameOffset = (int)(short)(frame * 4 + 4);
     if (frameOffset < (int)*(unsigned short *)(shape + 4)) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         memcpy(frameExtents, shape + *(int *)(shape + frameOffset),
                sizeof(frameExtents));
         rightExtent = frameExtents[0];
@@ -769,7 +769,7 @@ void DecodeShapeFrame(unsigned char *shape, short frame,
     int y;
     int runRight;
     int skip;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     short coordinate;
 #endif
 
@@ -782,14 +782,14 @@ void DecodeShapeFrame(unsigned char *shape, short frame,
     maximumX = (short)(width - 1);
     commands = shape + *(int *)(shape + frameOffset) + 8;
     maximumY = (short)(height - 1);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     memcpy((void *)&rowCode, commands, sizeof(rowCode));
 #else
     rowCode = *(unsigned short *)commands;
 #endif
     commands += 2;
     while (rowCode != 0) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         memcpy(&coordinate, commands, sizeof(coordinate));
         x = leftExtent + coordinate;
         memcpy(&coordinate, commands + 2, sizeof(coordinate));
@@ -875,7 +875,7 @@ void DecodeShapeFrame(unsigned char *shape, short frame,
             }
             commands += rowCode;
         }
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         memcpy((void *)&rowCode, commands, sizeof(rowCode));
 #else
         rowCode = *(unsigned short *)commands;

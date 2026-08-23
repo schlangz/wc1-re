@@ -177,7 +177,7 @@ void SetAwakenBarracksMenuLabel(char **label, int series, int mission,
                                 char *description)
 {
     FreeBarracksMenuLabel(label);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     /* MSVC 4.20 accepts %Fs as its legacy far-string conversion. */
     sprintf(szTextScratchBuffer, "Awaken %s.", description);
 #else

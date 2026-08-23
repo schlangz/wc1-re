@@ -65,7 +65,7 @@ char *LocateStreamsDirOnDisc(void)
         return result;
     }
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     if (strstr(current, "gamedat") != 0 ||
         strstr(current, "GAMEDAT") != 0)
 #else

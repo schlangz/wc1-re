@@ -9,7 +9,7 @@
  *  list below is the original source order of this file.
  */
 #include "ix.h"
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 #include <dsound.h>
 #endif
 #include <stdlib.h>
@@ -36,10 +36,10 @@ BOOL CALLBACK ix_dsp_open_driver(LPGUID guid, LPSTR description,
 /* Function start: 0x00445F60 */   /* source lines 46, 50, 60, 63, 81, 84, 96 */
 DWORD WINAPI ix_mixer_thread_proc(void *parameter)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     (void)parameter;
     SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
-    if (!Wc1SdlStartAudio(ix_dspv_mix, &csMixer,
+    if (!SdlStartAudio(ix_dspv_mix, &csMixer,
                           &dwDspTick)) {
         ix_log_printf("Fatal [%s - %d]:\n", IX_MIXER_FILE, 50);
         ix_log_printf("Failed to init SDL audio: %s", SDL_GetError());
@@ -49,7 +49,7 @@ DWORD WINAPI ix_mixer_thread_proc(void *parameter)
         WaitForSingleObject(hMixerWakeEvent, INFINITE);
         ResetEvent(hMixerWakeEvent);
     }
-    Wc1SdlStopAudio();
+    SdlStopAudio();
     return 0;
 #else
     DSCAPS driverCaps;
@@ -177,7 +177,7 @@ DWORD WINAPI ix_mixer_thread_proc(void *parameter)
 /* Function start: 0x004463FC */   /* source line(s) 150;157;161;176;186;196: Failed to Lock, %s | Failed to Unlock, %s | Failed to Play, %s | Failed to get current pos */
 int ix_mixer_service(void)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     return 0;
 #else
     DWORD delay;

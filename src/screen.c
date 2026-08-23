@@ -418,7 +418,7 @@ void *PushMemoryStackFrame(void *memory, int offset)
     int index;
 
     if (offset != 0) {
-#if !defined(WC1_SDL) || defined(WC1_SDL_LEGACY_DEBUG_OUTPUT)
+#if !defined(SDL_PORT) || defined(SDL_PORT_LEGACY_DEBUG_OUTPUT)
         printf("push %p by %d\n", memory, offset);
 #endif
         if (nPacketHandleCount == 0x1000)
@@ -485,7 +485,7 @@ void *MapPacketHandleToBlock(void *handle)
             handle = (unsigned char *)handle + offset;
         else
             handle = (unsigned char *)handle - offset;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         apPacketHandles[i] =
             apPacketHandles[count - 1];
 #else
@@ -506,7 +506,7 @@ void *AllocateTaggedMemory(unsigned int size, unsigned short flags)
     unsigned short tagged;
 
     tagged = flags & 0x40;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     if (tagged != 0)
         size += 8 + sizeof(unsigned char *);
 #else
@@ -515,7 +515,7 @@ void *AllocateTaggedMemory(unsigned int size, unsigned short flags)
 #endif
     memory = AllocateGuardedMemory(size);
     if (tagged != 0) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         *(unsigned char **)memory = 0;
         memcpy((unsigned char *)memory + sizeof(unsigned char *),
                abTaggedAllocationPrefix,
@@ -1510,7 +1510,7 @@ void HandleCommunicationMenuRequest(void)
 void show_communications_disp(void)
 {
     signed char choice;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     int selectedChoice;
     unsigned char normalColour;
 #endif
@@ -1522,20 +1522,20 @@ void show_communications_disp(void)
         choice = 0;
         DrawTextAt(&stRightVduTextContext, stRightVdu.left,
                    stRightVdu.top, pszCommMenuHeading, 2);
-#ifdef WC1_SDL
-        selectedChoice = Wc1SdlGetCommunicationMenuSelection();
+#ifdef SDL_PORT
+        selectedChoice = SdlGetCommunicationMenuSelection();
         normalColour = stRightVduTextContext.colour;
 #endif
         if (nCommMenuChoiceCount > 0) {
             do {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 if ((int)choice == selectedChoice)
                     stRightVduTextContext.colour = cYellowColour;
 #endif
                 DrawFormattedText("\n%d %s", (int)choice + 1,
                                   apszCommMenuChoiceText[
                                       (int)choice]);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 stRightVduTextContext.colour = normalColour;
 #endif
                 choice++;
@@ -1591,7 +1591,7 @@ void talk_equiv(void)
 /* Function start: 0x431410 */
 void FreeCommDisplayResources(void)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     /* The original indexes the portrait table with its -1 inactive sentinel,
        aliasing the final two palette-allocation words at 0x0059E17C. */
     if (nCommPortraitIndex != -1)
@@ -1609,7 +1609,7 @@ void FreeCommDisplayResources(void)
 /* Function start: 0x431470 */
 void EndCommSessionWithWingman(void)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     if (nCommPortraitIndex != -1 &&
 #else
     if (
@@ -1759,7 +1759,7 @@ void real_vid_transmit(short obj, short message)
         nCommPortraitIndex][message];
     if (nCommSpeakerRating >= 0 &&
         nCommSpeakerRating <= 7) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         /* MSVC 4.20 accepts %Fs as its legacy far-string conversion. */
         sprintf(text, "%s: %s",
                 apWingmanPilots[
@@ -1773,7 +1773,7 @@ void real_vid_transmit(short obj, short message)
 #endif
     } else if (nCommSpeakerRating >= 9 &&
                nCommSpeakerRating <= 12) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         sprintf(text, "%s: %s",
                 apszKilrathiAceNames[
                     nCommSpeakerRating - 9],
@@ -1785,7 +1785,7 @@ void real_vid_transmit(short obj, short message)
                 speech);
 #endif
     } else {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         sprintf(text, "%s: %s",
                 aObjectTypeData[
                     *(enum ObjectType *)(void *)
@@ -1870,7 +1870,7 @@ void PrintPaletteAllocationMap(void)
     do {
         column = 0x40;
         do {
-#if !defined(WC1_SDL) || defined(WC1_SDL_LEGACY_DEBUG_OUTPUT)
+#if !defined(SDL_PORT) || defined(SDL_PORT_LEGACY_DEBUG_OUTPUT)
             printf("%c", awPaletteEntryAllocation[index++] < 1 ?
                    '_' : '.');
 #else
@@ -1878,7 +1878,7 @@ void PrintPaletteAllocationMap(void)
 #endif
             column--;
         } while (column != 0);
-#if !defined(WC1_SDL) || defined(WC1_SDL_LEGACY_DEBUG_OUTPUT)
+#if !defined(SDL_PORT) || defined(SDL_PORT_LEGACY_DEBUG_OUTPUT)
         printf("\n");
 #endif
         row--;

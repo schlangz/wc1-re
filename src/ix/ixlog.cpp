@@ -10,12 +10,12 @@
  *      ix_log_printf("human readable message");
  */
 #include "ix.h"
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 #include <stdarg.h>
 #endif
 #include <stdio.h>
 #include <string.h>
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 #include <crtdbg.h>
 #endif
 
@@ -30,7 +30,7 @@ extern "C" void SoundDebugPrintf(const char *fmt, ...);   /* 0x00403DB0 */
 void ix_log_printf(const char *fmt, ...)
 {
     if (fmt != 0) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         va_list arguments;
 
         va_start(arguments, fmt);
@@ -45,8 +45,8 @@ void ix_log_printf(const char *fmt, ...)
 
     if (strncmp(szLogBuf, "sleep_for", 9) != 0) {
         SoundDebugPrintf("%s", szLogBuf);
-#ifdef WC1_SDL
-        Wc1SdlOutputDebugString(szLogBuf);
+#ifdef SDL_PORT
+        SdlOutputDebugString(szLogBuf);
 #else
         if (_CrtDbgReport(0, 0, 0, 0, "%s", szLogBuf) == 1)
             _CrtDbgBreak();

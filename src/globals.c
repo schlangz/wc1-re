@@ -1043,7 +1043,7 @@ const short asCannedSequence44[] = { /* 0x0046c2a0 */
 const short asCannedSequence45[] = { 0, 20, 2, -1 }; /* 0x0046c2e8 */
 
 const signed char acDirectionShapeFrame[ /* 0x0046db28 */
-    WC1_DIRECTION_VIEW_COUNT * WC1_DIRECTION_SHAPE_TABLE_COUNT] = {
+    DIRECTION_VIEW_COUNT * DIRECTION_SHAPE_TABLE_COUNT] = {
     0, 1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2,
     14, 13, 12, 11, 10, 9, 8, 9, 10, 11, 12, 13,
     15, 16, 17, 18, 19, 20, 21, 20, 19, 18, 17, 16,
@@ -1062,7 +1062,7 @@ const signed char acDirectionShapeFrame[ /* 0x0046db28 */
     13, 14, 15, 13, 15, 14, 13, 14, 15, 13, 15, 14, 16
 };
 const signed char acDirectionShapeFlip[ /* 0x0046dbe8 */
-    WC1_DIRECTION_VIEW_COUNT * WC1_DIRECTION_SHAPE_TABLE_COUNT] = {
+    DIRECTION_VIEW_COUNT * DIRECTION_SHAPE_TABLE_COUNT] = {
     0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
     0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
     0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
@@ -1081,7 +1081,7 @@ const signed char acDirectionShapeFlip[ /* 0x0046dbe8 */
     0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0
 };
 
-MissionNavPoint aMissionNavPoints[WC1_MISSION_NAV_POINT_COUNT] = { /* 0x0046c2f0 */
+MissionNavPoint aMissionNavPoints[MISSION_NAV_POINT_COUNT] = { /* 0x0046c2f0 */
     { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
     { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
     {
@@ -1111,7 +1111,7 @@ MissionNavPoint aMissionNavPoints[WC1_MISSION_NAV_POINT_COUNT] = { /* 0x0046c2f0
 };
 
 MissionShipRecord
-    aMissionShips[WC1_MISSION_SHIP_STORAGE_COUNT] = { /* 0x0046c948 */
+    aMissionShips[MISSION_SHIP_STORAGE_COUNT] = { /* 0x0046c948 */
     { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
     { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
     { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
@@ -1984,12 +1984,12 @@ short nPacketDecompressSourceFile; /* 0x0059a858 */
 unsigned char abInputKeyState[0x80]; /* 0x0059a860 */
 int nMouseCursorDrawnY; /* 0x0059a8e0 */
 int nMouseCursorDrawnX; /* 0x0059a8e4 */
-int anObjectDepthPlaced[WC1_SPACE_OBJECT_COUNT]; /* 0x0059a8f0 */
+int anObjectDepthPlaced[SPACE_OBJECT_COUNT]; /* 0x0059a8f0 */
 short DAT_0059a9f0;
 signed char cScreenViewportMode; /* 0x0059a9f2 */
 const ScreenViewportGeometry * volatile
     pScreenViewportGeometry; /* 0x0059a9f4 */
-int anSortedObject[WC1_SPACE_OBJECT_COUNT]; /* 0x0059aa00 */
+int anSortedObject[SPACE_OBJECT_COUNT]; /* 0x0059aa00 */
 short nPacketDecompressInputPosition; /* 0x0059ab00 */
 void *pPacketDecompressInput; /* 0x0059ab04 */
 unsigned short wCurrentInputModifiers; /* 0x0059ab08 */
@@ -2016,26 +2016,26 @@ int aiInputEventSlotUsed[0x100]; /* 0x0059ab70 */
 MouseCursorState stHostMouseState; /* 0x0059af70 */
 TextContext *pCurrentTextContext; /* 0x0059af8c */
 int nInputTickScale; /* 0x0059af90 */
-FixedVector aObjectViewPosition[WC1_SPACE_OBJECT_COUNT]; /* 0x0059afa0 */
-short anObjectPitchRotation[WC1_SPACE_OBJECT_COUNT]; /* 0x0059b2a0 */
+FixedVector aObjectViewPosition[SPACE_OBJECT_COUNT]; /* 0x0059afa0 */
+short anObjectPitchRotation[SPACE_OBJECT_COUNT]; /* 0x0059b2a0 */
 int anShipSpeed[64]; /* 0x0059b320 */
 short nSpaceFrame; /* 0x0059b420 */
 unsigned int anShipAlertFlags[12]; /* 0x0059b430 */
 FixedVector vPlayerAcceleration; /* 0x0059b460 */
 int anShipFuel[12]; /* 0x0059b470 */
-short asObjectDistance[WC1_SPACE_OBJECT_COUNT]; /* 0x0059b4a0 */
+short asObjectDistance[SPACE_OBJECT_COUNT]; /* 0x0059b4a0 */
 ShortVector aShipFormationOffset[10]; /* 0x0059b520 */
-enum ObjectType aeObjectType[WC1_SPACE_OBJECT_COUNT]; /* 0x0059b560 */
-short asObjectAnimationDelay[WC1_SPACE_OBJECT_COUNT]; /* 0x0059b660 */
+enum ObjectType aeObjectType[SPACE_OBJECT_COUNT]; /* 0x0059b560 */
+short asObjectAnimationDelay[SPACE_OBJECT_COUNT]; /* 0x0059b660 */
 FixedVector aShipRightVector[64]; /* 0x0059b6e0 */
 FixedVector aShipUpVector[64]; /* 0x0059b9e0 */
 FixedVector aShipForwardVector[64]; /* 0x0059bce0 */
 HazardField *pActiveHazardField; /* 0x0059bfe0 */
 signed char acPlayerComponentDamage[9]; /* 0x0059bff0 */
-signed char abFlightPath[WC1_MISSION_OBJECTIVE_COUNT]; /* 0x0059c000 */
-FixedVector aShipVelocity[WC1_SPACE_OBJECT_COUNT]; /* 0x0059c010 */
+signed char abFlightPath[MISSION_OBJECTIVE_COUNT]; /* 0x0059c000 */
+FixedVector aShipVelocity[SPACE_OBJECT_COUNT]; /* 0x0059c010 */
 short anYawGoal[16]; /* 0x0059c310 */
-short asObjectCounter[WC1_SPACE_OBJECT_COUNT]; /* 0x0059c330 */
+short asObjectCounter[SPACE_OBJECT_COUNT]; /* 0x0059c330 */
 short nTargetShip; /* 0x0059c3b0 */
 enum SpecialManeuver aeSpecialManeuver[12]; /* 0x0059c3c0 */
 enum ShipMissionType aeShipMissionType[12]; /* 0x0059c3f0 */
@@ -2044,14 +2044,14 @@ short asShipMaximumSpeed[16]; /* 0x0059c440 */
 signed char acShipDamage[10]; /* 0x0059c460 */
 signed char cMissionObjectiveCount; /* 0x0059c46a */
 short asViableTargetDistance[16]; /* 0x0059c470 */
-FixedVector aShipPosition[WC1_SPACE_OBJECT_COUNT]; /* 0x0059c490 */
-short asObjectRadarRadius[WC1_SPACE_OBJECT_COUNT]; /* 0x0059c790 */
+FixedVector aShipPosition[SPACE_OBJECT_COUNT]; /* 0x0059c490 */
+short asObjectRadarRadius[SPACE_OBJECT_COUNT]; /* 0x0059c790 */
 short asShipAfterburnerTimer[16]; /* 0x0059c810 */
 short nShipMissionIndices[10]; /* 0x0059c830 */
 signed char acShipCommunicator[16]; /* 0x0059c850 */
 FixedVector vStarFieldMotion; /* 0x0059c860 */
 signed char cCurrentNavPointIndex; /* 0x0059c86c */
-short asObjectFlip[WC1_SPACE_OBJECT_COUNT]; /* 0x0059c870 */
+short asObjectFlip[SPACE_OBJECT_COUNT]; /* 0x0059c870 */
 short nEyeRollGoal; /* 0x0059c8f0 */
 FixedVector vPreviousStarFieldMotion; /* 0x0059c900 */
 short nHazardFieldCount; /* 0x0059c90c */
@@ -2059,12 +2059,12 @@ signed char acLastAttacker[16]; /* 0x0059c910 */
 signed char acViableTarget[16]; /* 0x0059c920 */
 short asActionCount[10]; /* 0x0059c930 */
 short nEyeYawGoal; /* 0x0059c944 */
-short asObjectScreenScale[WC1_SPACE_OBJECT_COUNT]; /* 0x0059c950 */
-short asObjectAfterburnerVelocity[WC1_SPACE_OBJECT_COUNT]; /* 0x0059c9d0 */
+short asObjectScreenScale[SPACE_OBJECT_COUNT]; /* 0x0059c950 */
+short asObjectAfterburnerVelocity[SPACE_OBJECT_COUNT]; /* 0x0059c9d0 */
 CampaignState stCampaignState; /* 0x0059ca50 */
 unsigned char aShipWeapons[10][0x47]; /* 0x0059cab0 */
 signed char acShipRating[16]; /* 0x0059cd80 */
-short asObjectScreenAngle[WC1_SPACE_OBJECT_COUNT]; /* 0x0059cd90 */
+short asObjectScreenAngle[SPACE_OBJECT_COUNT]; /* 0x0059cd90 */
 short nTargetRange; /* 0x0059ce10 */
 unsigned int anVduModeCache[2]; /* 0x0059ce18 */
 signed char acObjectOwner[64]; /* 0x0059ce20 */
@@ -2072,22 +2072,22 @@ signed char acShipTarget[16]; /* 0x0059ce60 */
 short nPreviousPitchInput; /* 0x0059ce70 */
 short nPreviousYawInput; /* 0x0059ce72 */
 short nPreviousRollInput; /* 0x0059ce74 */
-short anObjectYawRotation[WC1_SPACE_OBJECT_COUNT]; /* 0x0059ce80 */
+short anObjectYawRotation[SPACE_OBJECT_COUNT]; /* 0x0059ce80 */
 signed char acPilotHitPoints[16]; /* 0x0059cf00 */
 signed char acTurnRegulator[16]; /* 0x0059cf10 */
 unsigned char abCollisionAlertTarget[0x10]; /* 0x0059cf20 */
 int aiPilotLevel[12]; /* 0x0059cf30 */
 short asTargetListRange[16]; /* 0x0059cf60 */
-short asObjectDrawY[WC1_SPACE_OBJECT_COUNT]; /* 0x0059cf80 */
-short asObjectDrawX[WC1_SPACE_OBJECT_COUNT]; /* 0x0059d000 */
-short asPreviousObjectDistance[WC1_SPACE_OBJECT_COUNT]; /* 0x0059d080 */
-enum ObjectClass aeObjectClass[WC1_SPACE_OBJECT_COUNT]; /* 0x0059d100 */
+short asObjectDrawY[SPACE_OBJECT_COUNT]; /* 0x0059cf80 */
+short asObjectDrawX[SPACE_OBJECT_COUNT]; /* 0x0059d000 */
+short asPreviousObjectDistance[SPACE_OBJECT_COUNT]; /* 0x0059d080 */
+enum ObjectClass aeObjectClass[SPACE_OBJECT_COUNT]; /* 0x0059d100 */
 enum ShipObjective aeShipObjective[12]; /* 0x0059d200 */
-short asObjectViewFrame[WC1_SPACE_OBJECT_COUNT]; /* 0x0059d230 */
+short asObjectViewFrame[SPACE_OBJECT_COUNT]; /* 0x0059d230 */
 int nCurrentObjectiveRange; /* 0x0059d2b0 */
 signed char acWingmanMessageState[16]; /* 0x0059d2c0 */
 short asCollisionCountdown[16]; /* 0x0059d2d0 */
-unsigned char *apObjectShape[WC1_SPACE_OBJECT_COUNT]; /* 0x0059d2f0 */
+unsigned char *apObjectShape[SPACE_OBJECT_COUNT]; /* 0x0059d2f0 */
 short nPitchInput; /* 0x0059d3f0 */
 short nYawInput; /* 0x0059d3f2 */
 short nRollInput; /* 0x0059d3f4 */
@@ -2114,34 +2114,34 @@ short anRollGoal[16]; /* 0x0059d630 */
 enum Side aeShipSide[12]; /* 0x0059d650 */
 signed char acShipAiCooldown[16]; /* 0x0059d680 */
 FixedVector vCollisionDelta; /* 0x0059d690 */
-signed char acLastCollisionObject[WC1_SPACE_OBJECT_COUNT]; /* 0x0059d6a0 */
+signed char acLastCollisionObject[SPACE_OBJECT_COUNT]; /* 0x0059d6a0 */
 short aasShipMaximumShield[10][2]; /* 0x0059d6e0 */
 short asObjectCollisionRadius[64]; /* 0x0059d710 */
 signed char acShipPointingMode[16]; /* 0x0059d790 */
 short anPitchGoal[16]; /* 0x0059d7a0 */
 signed char abShipNavPointIndex[16]; /* 0x0059d7c0 */
 signed char acTurnInterval[16]; /* 0x0059d7d0 */
-short anObjectRollRotation[WC1_SPACE_OBJECT_COUNT]; /* 0x0059d7e0 */
+short anObjectRollRotation[SPACE_OBJECT_COUNT]; /* 0x0059d7e0 */
 signed char abShipTurn[16]; /* 0x0059d860 */
 HazardField aHazardFields[7]; /* 0x0059d870 */
 short nFacingToTarget; /* 0x0059d920 */
-short asObjectScreenY[WC1_SPACE_OBJECT_COUNT]; /* 0x0059d930 */
-short asObjectScreenX[WC1_SPACE_OBJECT_COUNT]; /* 0x0059d9b0 */
-short asObjectAnimationIndex[WC1_SPACE_OBJECT_COUNT]; /* 0x0059da30 */
+short asObjectScreenY[SPACE_OBJECT_COUNT]; /* 0x0059d930 */
+short asObjectScreenX[SPACE_OBJECT_COUNT]; /* 0x0059d9b0 */
+short asObjectAnimationIndex[SPACE_OBJECT_COUNT]; /* 0x0059da30 */
 signed char cCockpitView; /* 0x0059dab0 */
-MissionObjective aMissionObjectives[WC1_MISSION_OBJECTIVE_COUNT]; /* 0x0059dac0 */
+MissionObjective aMissionObjectives[MISSION_OBJECTIVE_COUNT]; /* 0x0059dac0 */
 enum ShipManeuver aeShipManeuver[12]; /* 0x0059dcb0 */
 const short *apCannedSequence[12]; /* 0x0059dce0 */
 FixedVector aShipMissionSpot[10]; /* 0x0059dd10 */
 short asCapitalShipViewFrame[16]; /* 0x0059dd90 */
 signed char acObjectCollisionGraceTicks[ /* 0x0059ddb0 */
-    WC1_SPACE_OBJECT_COUNT];
+    SPACE_OBJECT_COUNT];
 ObjectResourceSlot aObjectResourceSlots[4]; /* 0x0059ddf0 */
 signed char acShipDestroyedWeaponCount[16]; /* 0x0059de30 */
-short asObjectScale[WC1_SPACE_OBJECT_COUNT]; /* 0x0059de40 */
+short asObjectScale[SPACE_OBJECT_COUNT]; /* 0x0059de40 */
 signed char acVduModeStackDepth[16]; /* 0x0059dec0 */
 signed char acShipSpawnNavPoint[16]; /* 0x0059ded0 */
-short asShipAccumulatedDamage[WC1_SPACE_OBJECT_COUNT]; /* 0x0059dee0 */
+short asShipAccumulatedDamage[SPACE_OBJECT_COUNT]; /* 0x0059dee0 */
 short nCurrentNavPoint; /* 0x0059df60 */
 int nJoystickCalibrationMinimumY; /* 0x0059df64 */
 int nJoystickCalibrationMinimumX; /* 0x0059df68 */
@@ -2194,9 +2194,9 @@ Viewport stCockpitBar; /* 0x005a6be0 */
 unsigned char *pTargetLockShape; /* 0x005a6bf4 */
 unsigned char *apTextFonts[4]; /* 0x005a6c00 */
 FontWorkspace **apFontWorkspaces[4]; /* 0x005a6c10 */
-FixedVector aDirectionViewRightVector[WC1_DIRECTION_VIEW_COUNT]; /* 0x005a6c20 */
-FixedVector aDirectionViewUpVector[WC1_DIRECTION_VIEW_COUNT]; /* 0x005a6f10 */
-FixedVector aDirectionViewForwardVector[WC1_DIRECTION_VIEW_COUNT]; /* 0x005a7200 */
+FixedVector aDirectionViewRightVector[DIRECTION_VIEW_COUNT]; /* 0x005a6c20 */
+FixedVector aDirectionViewUpVector[DIRECTION_VIEW_COUNT]; /* 0x005a6f10 */
+FixedVector aDirectionViewForwardVector[DIRECTION_VIEW_COUNT]; /* 0x005a7200 */
 TextContext stLeftVduTextContext; /* 0x005a74f0 */
 Viewport stSpaceBuffer; /* 0x005a7510 */
 Viewport stRightVdu; /* 0x005a7530 */

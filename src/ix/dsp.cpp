@@ -9,7 +9,7 @@
  *  list below is the original source order of this file.
  */
 #include "ix.h"
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 #include <dsound.h>
 #endif
 #include <stdlib.h>
@@ -29,7 +29,7 @@ LPDIRECTSOUNDBUFFER pMixerBuffer;
 unsigned int dwDspTick;
 LPDIRECTSOUNDBUFFER pPrimarySoundBuffer;
 int nVoicesAllocated;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 void *(__cdecl *pIxMalloc)(unsigned int) =
     (void *(__cdecl *)(unsigned int))malloc;
 #else
@@ -47,7 +47,7 @@ int ix_dsp_init(void)
         InitializeCriticalSection(&csMixer);
         hMixerWakeEvent = CreateEventA(0, TRUE, FALSE, 0);
         ix_dsp_build_pan_tables();
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         dwDspFlags |= 4;
 #endif
         hMixerThread = CreateThread(
@@ -67,7 +67,7 @@ int ix_dsp_init(void)
 void ix_dsp_shutdown(void)
 {
     if ((dwDspFlags & 1) != 0) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         if (hMixerThread != 0) {
             dwDspFlags &= ~4U;
             SetEvent(hMixerWakeEvent);
@@ -125,7 +125,7 @@ void ix_dsp_configure(int option, void *value)
 BOOL CALLBACK ix_dsp_open_driver(LPGUID guid, LPSTR description,
                                  LPSTR module, LPVOID context)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     (void)guid;
     (void)description;
     (void)module;
@@ -289,7 +289,7 @@ void ix_dsp_build_pan_tables(void)
 /* Function start: 0x00444F97 */
 const char *ix_dsp_result_to_text(int result)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     (void)result;
     return SDL_GetError();
 #else

@@ -3,29 +3,29 @@
 
 #include "video_internal.h"
 
-#define WC1_SDL_DOS_INTRO_ACTOR_COUNT 10
-#define WC1_SDL_DOS_INTRO_TITLE_SECTION_COUNT 12
-#define WC1_SDL_DOS_INTRO_FIREWORK_COUNT 30
-#define WC1_SDL_DOS_INTRO_INITIAL_FIREWORK_COUNT 5
+#define SDL_PORT_DOS_INTRO_ACTOR_COUNT 10
+#define SDL_PORT_DOS_INTRO_TITLE_SECTION_COUNT 12
+#define SDL_PORT_DOS_INTRO_FIREWORK_COUNT 30
+#define SDL_PORT_DOS_INTRO_INITIAL_FIREWORK_COUNT 5
 
-typedef struct Wc1SdlDosIntroActor {
+typedef struct SdlDosIntroActor {
     short x;
     short y;
     short velocityX;
     short velocityY;
     char frames[33];
-} Wc1SdlDosIntroActor;
+} SdlDosIntroActor;
 
-typedef struct Wc1SdlDosIntroFirework {
+typedef struct SdlDosIntroFirework {
     short frame;
     short x;
     short y;
     short variant;
-} Wc1SdlDosIntroFirework;
+} SdlDosIntroFirework;
 
 /* Coordinates, motion, and animation strings from the DOS VROOMM overlay. */
-static const Wc1SdlDosIntroActor g_aWc1SdlDosIntroActors[
-    WC1_SDL_DOS_INTRO_ACTOR_COUNT] = {
+static const SdlDosIntroActor g_aSdlDosIntroActors[
+    SDL_PORT_DOS_INTRO_ACTOR_COUNT] = {
     {  58,  94, -1, 1, "abcdefghijkaakkkkaaaalllllllmmll" },
     { 186,  94,  0, 1, "aaaaaaaabcddeeddccffgghhgghhiiih" },
     { 278,  94,  1, 1, "aaaaaaaaaabbccbbaaccccccccccaccc" },
@@ -38,10 +38,10 @@ static const Wc1SdlDosIntroActor g_aWc1SdlDosIntroActors[
     { 158,  74,  0, 4, "abccdefgghiijjiihhkkllmmllkkhnnn" }
 };
 
-static const char g_szWc1SdlDosIntroConductorFrames[] =
+static const char g_szSdlDosIntroConductorFrames[] =
     "opoqopoqopoqopoqqrstrq";
 
-static void Wc1SdlDrawDosIntroSky(Viewport *viewport,
+static void SdlDrawDosIntroSky(Viewport *viewport,
                                    unsigned char *titleShape,
                                    unsigned char *planetShape,
                                    int planetY)
@@ -52,7 +52,7 @@ static void Wc1SdlDrawDosIntroSky(Viewport *viewport,
         DrawSpriteDefault(viewport, 160, (short)planetY, planetShape, 0);
 }
 
-static void Wc1SdlDrawDosIntroLogo(Viewport *viewport,
+static void SdlDrawDosIntroLogo(Viewport *viewport,
                                     unsigned char *titleShape,
                                     short y, short scale)
 {
@@ -67,7 +67,7 @@ static void Wc1SdlDrawDosIntroLogo(Viewport *viewport,
     DrawSpriteScaled(viewport, right, y, titleShape, 3, 0, scale, 0);
 }
 
-static int Wc1SdlPresentDosIntroFrame(Viewport *viewport)
+static int SdlPresentDosIntroFrame(Viewport *viewport)
 {
     Viewport destination;
 
@@ -82,67 +82,67 @@ static int Wc1SdlPresentDosIntroFrame(Viewport *viewport)
     return CheckEscaped() == 0;
 }
 
-static int Wc1SdlDrawDosIntroOrchestra(
+static int SdlDrawDosIntroOrchestra(
     Viewport *viewport, unsigned char **titleSections,
     unsigned char *planetShape, int sequenceFrame)
 {
-    const Wc1SdlDosIntroActor *actor;
+    const SdlDosIntroActor *actor;
     int actorIndex;
     int frame;
 
-    Wc1SdlDrawDosIntroSky(viewport, titleSections[0], planetShape, 24);
+    SdlDrawDosIntroSky(viewport, titleSections[0], planetShape, 24);
     actorIndex = 0;
-    while (actorIndex < WC1_SDL_DOS_INTRO_ACTOR_COUNT) {
-        actor = &g_aWc1SdlDosIntroActors[actorIndex];
+    while (actorIndex < SDL_PORT_DOS_INTRO_ACTOR_COUNT) {
+        actor = &g_aSdlDosIntroActors[actorIndex];
         frame = actor->frames[sequenceFrame] - 'a';
         DrawSpriteDefault(viewport, actor->x, actor->y,
                           titleSections[actorIndex + 1], (short)frame);
         actorIndex++;
     }
-    return Wc1SdlPresentDosIntroFrame(viewport);
+    return SdlPresentDosIntroFrame(viewport);
 }
 
-static int Wc1SdlDrawDosIntroConductorCue(
+static int SdlDrawDosIntroConductorCue(
     Viewport *viewport, unsigned char **titleSections,
     unsigned char *planetShape, int cueFrame)
 {
-    const Wc1SdlDosIntroActor *actor;
+    const SdlDosIntroActor *actor;
     int actorIndex;
     int frame;
 
-    Wc1SdlDrawDosIntroSky(viewport, titleSections[0], planetShape, 24);
+    SdlDrawDosIntroSky(viewport, titleSections[0], planetShape, 24);
     actorIndex = 0;
-    while (actorIndex < WC1_SDL_DOS_INTRO_ACTOR_COUNT - 1) {
-        actor = &g_aWc1SdlDosIntroActors[actorIndex];
+    while (actorIndex < SDL_PORT_DOS_INTRO_ACTOR_COUNT - 1) {
+        actor = &g_aSdlDosIntroActors[actorIndex];
         frame = actor->frames[31] - 'a';
         DrawSpriteDefault(viewport, actor->x, actor->y,
                           titleSections[actorIndex + 1], (short)frame);
         actorIndex++;
     }
-    actor = &g_aWc1SdlDosIntroActors[actorIndex];
-    frame = g_szWc1SdlDosIntroConductorFrames[cueFrame] - 'a';
+    actor = &g_aSdlDosIntroActors[actorIndex];
+    frame = g_szSdlDosIntroConductorFrames[cueFrame] - 'a';
     DrawSpriteDefault(viewport, actor->x, actor->y,
                       titleSections[actorIndex + 1], (short)frame);
-    return Wc1SdlPresentDosIntroFrame(viewport);
+    return SdlPresentDosIntroFrame(viewport);
 }
 
-static int Wc1SdlDrawDosIntroOrchestraPush(
+static int SdlDrawDosIntroOrchestraPush(
     Viewport *viewport, unsigned char **titleSections,
     unsigned char *planetShape, int distance)
 {
-    const Wc1SdlDosIntroActor *actor;
+    const SdlDosIntroActor *actor;
     int actorIndex;
     int frame;
     int scale;
     int x;
     int y;
 
-    Wc1SdlDrawDosIntroSky(viewport, titleSections[0], planetShape, 24);
+    SdlDrawDosIntroSky(viewport, titleSections[0], planetShape, 24);
     actorIndex = 0;
-    while (actorIndex < WC1_SDL_DOS_INTRO_ACTOR_COUNT) {
-        actor = &g_aWc1SdlDosIntroActors[actorIndex];
-        if (actorIndex == WC1_SDL_DOS_INTRO_ACTOR_COUNT - 1) {
-            frame = g_szWc1SdlDosIntroConductorFrames[21] - 'a';
+    while (actorIndex < SDL_PORT_DOS_INTRO_ACTOR_COUNT) {
+        actor = &g_aSdlDosIntroActors[actorIndex];
+        if (actorIndex == SDL_PORT_DOS_INTRO_ACTOR_COUNT - 1) {
+            frame = g_szSdlDosIntroConductorFrames[21] - 'a';
         } else {
             frame = actor->frames[31] - 'a';
         }
@@ -154,10 +154,10 @@ static int Wc1SdlDrawDosIntroOrchestraPush(
                               0, scale, scale, 0, 0);
         actorIndex++;
     }
-    return Wc1SdlPresentDosIntroFrame(viewport);
+    return SdlPresentDosIntroFrame(viewport);
 }
 
-static int Wc1SdlDrawDosIntroLogoReveal(
+static int SdlDrawDosIntroLogoReveal(
     Viewport *viewport, unsigned char *titleShape,
     unsigned char *planetShape, short logoY, int distance)
 {
@@ -172,28 +172,28 @@ static int Wc1SdlDrawDosIntroLogoReveal(
     DrawSpriteDefault(viewport, 0, 0, titleShape, 0);
     if (logoBottom < planetY) {
         DrawSpriteDefault(viewport, 160, (short)planetY, planetShape, 0);
-        Wc1SdlDrawDosIntroLogo(viewport, titleShape, logoY, (short)scale);
+        SdlDrawDosIntroLogo(viewport, titleShape, logoY, (short)scale);
     } else {
-        Wc1SdlDrawDosIntroLogo(viewport, titleShape, logoY, (short)scale);
+        SdlDrawDosIntroLogo(viewport, titleShape, logoY, (short)scale);
         DrawSpriteDefault(viewport, 160, (short)planetY, planetShape, 0);
     }
-    return Wc1SdlPresentDosIntroFrame(viewport);
+    return SdlPresentDosIntroFrame(viewport);
 }
 
-static void Wc1SdlResetDosIntroFireworks(
-    Wc1SdlDosIntroFirework *fireworks)
+static void SdlResetDosIntroFireworks(
+    SdlDosIntroFirework *fireworks)
 {
     int index;
 
     index = 0;
-    while (index < WC1_SDL_DOS_INTRO_FIREWORK_COUNT) {
+    while (index < SDL_PORT_DOS_INTRO_FIREWORK_COUNT) {
         fireworks[index].frame = -1;
         index++;
     }
 }
 
-static void Wc1SdlStartDosIntroFirework(
-    Wc1SdlDosIntroFirework *fireworks, int count)
+static void SdlStartDosIntroFirework(
+    SdlDosIntroFirework *fireworks, int count)
 {
     int index;
 
@@ -208,19 +208,19 @@ static void Wc1SdlStartDosIntroFirework(
     fireworks[index].variant = RandomInRange(0, 2);
 }
 
-static int Wc1SdlDrawDosIntroFireworks(
+static int SdlDrawDosIntroFireworks(
     Viewport *viewport, unsigned char *titleShape,
-    unsigned char *fireworkShape, Wc1SdlDosIntroFirework *fireworks,
+    unsigned char *fireworkShape, SdlDosIntroFirework *fireworks,
     short logoY)
 {
-    Wc1SdlDosIntroFirework *firework;
+    SdlDosIntroFirework *firework;
     int index;
 
     ClearViewport(viewport, (unsigned char)cBlackColour);
     DrawSpriteDefault(viewport, 0, 0, titleShape, 0);
-    Wc1SdlDrawDosIntroLogo(viewport, titleShape, logoY, 0x100);
+    SdlDrawDosIntroLogo(viewport, titleShape, logoY, 0x100);
     index = 0;
-    while (index < WC1_SDL_DOS_INTRO_FIREWORK_COUNT) {
+    while (index < SDL_PORT_DOS_INTRO_FIREWORK_COUNT) {
         firework = &fireworks[index];
         if (firework->frame >= 0) {
             DrawSpriteDefault(viewport, firework->x, firework->y,
@@ -233,14 +233,14 @@ static int Wc1SdlDrawDosIntroFireworks(
         }
         index++;
     }
-    return Wc1SdlPresentDosIntroFrame(viewport);
+    return SdlPresentDosIntroFrame(viewport);
 }
 
-void Wc1SdlPlayDosStartupIntro(void)
+void SdlPlayDosStartupIntro(void)
 {
-    unsigned char *titleSections[WC1_SDL_DOS_INTRO_TITLE_SECTION_COUNT];
+    unsigned char *titleSections[SDL_PORT_DOS_INTRO_TITLE_SECTION_COUNT];
     unsigned char *planetShape;
-    Wc1SdlDosIntroFirework fireworks[WC1_SDL_DOS_INTRO_FIREWORK_COUNT];
+    SdlDosIntroFirework fireworks[SDL_PORT_DOS_INTRO_FIREWORK_COUNT];
     Viewport introViewport;
     int actorDirection;
     int actorFrame;
@@ -259,7 +259,7 @@ void Wc1SdlPlayDosStartupIntro(void)
     int sectionIndex;
     int synchronizedMusic;
 
-    if (!Wc1SdlUsingDosData() && !Wc1SdlUsingGlRenderer())
+    if (!SdlUsingDosData() && !SdlUsingGlRenderer())
         return;
 
     memset(&introViewport, 0, sizeof(introViewport));
@@ -275,7 +275,7 @@ void Wc1SdlPlayDosStartupIntro(void)
     memset(titleSections, 0, sizeof(titleSections));
     planetShape = 0;
     sectionIndex = 0;
-    while (sectionIndex < WC1_SDL_DOS_INTRO_TITLE_SECTION_COUNT) {
+    while (sectionIndex < SDL_PORT_DOS_INTRO_TITLE_SECTION_COUNT) {
         titleSections[sectionIndex] =
             FetchDiskPacketRetrying(9, (short)(sectionIndex + 6), 0);
         sectionIndex++;
@@ -290,20 +290,20 @@ void Wc1SdlPlayDosStartupIntro(void)
     introMusic = nMusicPlaybackMode != 0 && nMusicPlaybackMode != 3;
     if (introMusic) {
         nCurrentMusicTrack = 19;
-        Wc1SdlServiceOriginFxMusic();
+        SdlServiceOriginFxMusic();
     }
     synchronizedMusic = introMusic &&
-        Wc1SdlGetOriginFxMusicSequencePosition() >= 0;
+        SdlGetOriginFxMusicSequencePosition() >= 0;
 
-    running = Wc1SdlDrawDosIntroOrchestra(
+    running = SdlDrawDosIntroOrchestra(
         &introViewport, titleSections, planetShape, 0);
     if (synchronizedMusic) {
         actorDirection = 1;
         actorFrame = 0;
         actorMinimumFrame = 0;
-        musicPosition = Wc1SdlGetOriginFxMusicSequencePosition();
+        musicPosition = SdlGetOriginFxMusicSequencePosition();
         while (running && musicPosition >= 0 && musicPosition < 1) {
-            running = Wc1SdlDrawDosIntroOrchestra(
+            running = SdlDrawDosIntroOrchestra(
                 &introViewport, titleSections, planetShape, actorFrame);
             if (actorDirection > 0) {
                 actorFrame++;
@@ -319,7 +319,7 @@ void Wc1SdlPlayDosStartupIntro(void)
                     actorDirection = 1;
                 }
             }
-            musicPosition = Wc1SdlGetOriginFxMusicSequencePosition();
+            musicPosition = SdlGetOriginFxMusicSequencePosition();
         }
         if (musicPosition < 0)
             synchronizedMusic = 0;
@@ -327,19 +327,19 @@ void Wc1SdlPlayDosStartupIntro(void)
     if (!synchronizedMusic) {
         actorFrame = 0;
         while (running && actorFrame < 32) {
-            running = Wc1SdlDrawDosIntroOrchestra(
+            running = SdlDrawDosIntroOrchestra(
                 &introViewport, titleSections, planetShape, actorFrame);
             actorFrame++;
         }
         actorFrame = 31;
         while (running && actorFrame >= 12) {
-            running = Wc1SdlDrawDosIntroOrchestra(
+            running = SdlDrawDosIntroOrchestra(
                 &introViewport, titleSections, planetShape, actorFrame);
             actorFrame--;
         }
         actorFrame = 12;
         while (running && actorFrame < 32) {
-            running = Wc1SdlDrawDosIntroOrchestra(
+            running = SdlDrawDosIntroOrchestra(
                 &introViewport, titleSections, planetShape, actorFrame);
             actorFrame++;
         }
@@ -347,31 +347,31 @@ void Wc1SdlPlayDosStartupIntro(void)
 
     cueFrame = 0;
     while (running && cueFrame < 20) {
-        running = Wc1SdlDrawDosIntroConductorCue(
+        running = SdlDrawDosIntroConductorCue(
             &introViewport, titleSections, planetShape, cueFrame);
         cueFrame++;
     }
     if (running && synchronizedMusic) {
-        musicPosition = Wc1SdlGetOriginFxMusicSequencePosition();
+        musicPosition = SdlGetOriginFxMusicSequencePosition();
         while (running && musicPosition >= 0 && musicPosition < 2) {
             if (CheckEscaped() != 0) {
                 running = 0;
             } else {
-                Wc1SdlSleep(1);
-                musicPosition = Wc1SdlGetOriginFxMusicSequencePosition();
+                SdlSleep(1);
+                musicPosition = SdlGetOriginFxMusicSequencePosition();
             }
         }
         if (musicPosition < 0) {
             synchronizedMusic = 0;
         } else if (running) {
-            running = Wc1SdlDrawDosIntroConductorCue(
+            running = SdlDrawDosIntroConductorCue(
                 &introViewport, titleSections, planetShape, 20);
         }
     }
 
     distance = 1;
     while (running && distance < 120) {
-        running = Wc1SdlDrawDosIntroOrchestraPush(
+        running = SdlDrawDosIntroOrchestraPush(
             &introViewport, titleSections, planetShape, distance);
         distance += distance / 4 + 1;
     }
@@ -383,47 +383,47 @@ void Wc1SdlPlayDosStartupIntro(void)
             logoY -= 2;
         else
             logoY += 2;
-        running = Wc1SdlDrawDosIntroLogoReveal(
+        running = SdlDrawDosIntroLogoReveal(
             &introViewport, titleSections[0], planetShape, logoY,
             distance);
         distance -= 100;
     }
     if (running && synchronizedMusic) {
-        musicPosition = Wc1SdlGetOriginFxMusicSequencePosition();
+        musicPosition = SdlGetOriginFxMusicSequencePosition();
         while (running && musicPosition >= 0 && musicPosition < 3) {
             if (CheckEscaped() != 0) {
                 running = 0;
             } else {
-                Wc1SdlSleep(1);
-                musicPosition = Wc1SdlGetOriginFxMusicSequencePosition();
+                SdlSleep(1);
+                musicPosition = SdlGetOriginFxMusicSequencePosition();
             }
         }
         if (musicPosition < 0)
             synchronizedMusic = 0;
     }
 
-    Wc1SdlResetDosIntroFireworks(fireworks);
+    SdlResetDosIntroFireworks(fireworks);
     fireworkFrame = 0;
     finishingFireworks = 0;
     while (running) {
         musicPosition = synchronizedMusic
-            ? Wc1SdlGetOriginFxMusicSequencePosition() : -1;
+            ? SdlGetOriginFxMusicSequencePosition() : -1;
         if (synchronizedMusic && musicPosition < 0)
             synchronizedMusic = 0;
         if (!finishingFireworks) {
             if (!synchronizedMusic || musicPosition >= 4 ||
                 RandomInRange(0, 5) == 0) {
-                Wc1SdlStartDosIntroFirework(
+                SdlStartDosIntroFirework(
                     fireworks,
-                    WC1_SDL_DOS_INTRO_INITIAL_FIREWORK_COUNT);
+                    SDL_PORT_DOS_INTRO_INITIAL_FIREWORK_COUNT);
             }
         }
-        running = Wc1SdlDrawDosIntroFireworks(
+        running = SdlDrawDosIntroFireworks(
             &introViewport, titleSections[0], titleSections[11],
             fireworks, logoY);
         fireworkFrame++;
         if (synchronizedMusic) {
-            musicPosition = Wc1SdlGetOriginFxMusicSequencePosition();
+            musicPosition = SdlGetOriginFxMusicSequencePosition();
             if (musicPosition >= 5)
                 finishingFireworks = 1;
         } else if (fireworkFrame > 10) {
@@ -433,19 +433,19 @@ void Wc1SdlPlayDosStartupIntro(void)
             emptyFireworks = 0;
             fireworkIndex = 0;
             while (fireworkIndex <
-                   WC1_SDL_DOS_INTRO_INITIAL_FIREWORK_COUNT) {
+                   SDL_PORT_DOS_INTRO_INITIAL_FIREWORK_COUNT) {
                 if (fireworks[fireworkIndex].frame == -1)
                     emptyFireworks++;
                 fireworkIndex++;
             }
             if (emptyFireworks ==
-                WC1_SDL_DOS_INTRO_INITIAL_FIREWORK_COUNT)
+                SDL_PORT_DOS_INTRO_INITIAL_FIREWORK_COUNT)
                 break;
         }
     }
     if (running) {
         fireworkIndex = 0;
-        while (fireworkIndex < WC1_SDL_DOS_INTRO_FIREWORK_COUNT) {
+        while (fireworkIndex < SDL_PORT_DOS_INTRO_FIREWORK_COUNT) {
             fireworks[fireworkIndex].frame = 0;
             fireworks[fireworkIndex].x = RandomInRange(0, 319);
             fireworks[fireworkIndex].y = RandomInRange(0, 127);
@@ -454,7 +454,7 @@ void Wc1SdlPlayDosStartupIntro(void)
         }
         fireworkFrame = 0;
         while (running && fireworkFrame < 8) {
-            running = Wc1SdlDrawDosIntroFireworks(
+            running = SdlDrawDosIntroFireworks(
                 &introViewport, titleSections[0], titleSections[11],
                 fireworks, logoY);
             fireworkFrame++;
@@ -463,12 +463,12 @@ void Wc1SdlPlayDosStartupIntro(void)
 
     if (introMusic) {
         nCurrentMusicTrack = previousMusicTrack;
-        Wc1SdlServiceOriginFxMusic();
+        SdlServiceOriginFxMusic();
     }
     ClearViewport(&stScreen, (unsigned char)cBlackColour);
     free_viewport(&introViewport);
     ReleasePacketHandle(planetShape);
-    sectionIndex = WC1_SDL_DOS_INTRO_TITLE_SECTION_COUNT;
+    sectionIndex = SDL_PORT_DOS_INTRO_TITLE_SECTION_COUNT;
     while (sectionIndex > 0) {
         sectionIndex--;
         ReleasePacketHandle(titleSections[sectionIndex]);

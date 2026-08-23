@@ -705,7 +705,7 @@ unsigned int remove_weapon(short obj, short weapon)
          currentWeapon++) {
         unsigned char *entry = loadout + currentWeapon * 7;
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         /* The seven-byte records are intentionally unaligned. */
         memcpy(entry + 1, entry + 8, sizeof(ShipWeaponSlot));
 #else

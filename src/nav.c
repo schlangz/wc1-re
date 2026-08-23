@@ -821,7 +821,7 @@ void InflightComputer(void)
     unsigned char *background;
     InputEventState event;
     Viewport pointerViewport;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     MouseCursorState savedInputState;
 #else
     unsigned int savedInputState[7];
@@ -832,7 +832,7 @@ void InflightComputer(void)
     hasObjectives = 0;
     displayedNavPoint = savedNavPoint;
     bInflightComputerActive = 1;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     memcpy(&savedInputState,
            (const void *)&stMouseCursorState,
            sizeof(savedInputState));
@@ -942,7 +942,7 @@ void InflightComputer(void)
     ReleasePacketHandle(pNavMapShape);
     SetTextContext(&stDefaultTextContext);
     PlaySfxWaveFileByNumber(0x19, -1, 0);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     memcpy((void *)&stMouseCursorState,
            &savedInputState, sizeof(savedInputState));
     WarpMouseTo(savedInputState.x, savedInputState.y);
@@ -1706,7 +1706,7 @@ void __stdcall free_viewport(Viewport *viewport)
             ReleasePacketHandle(viewport->rowOffsets);
             viewport->rowOffsets = 0;
         }
-#if !defined(WC1_SDL) || defined(WC1_SDL_LEGACY_DEBUG_OUTPUT)
+#if !defined(SDL_PORT) || defined(SDL_PORT_LEGACY_DEBUG_OUTPUT)
         if (nVideoMode != 0x13)
             printf("free_viewport not mcga\n");
 #endif
@@ -1743,15 +1743,15 @@ void DrawTitleLogo(short distance, short y)
                               (short)(nScreenWidth >> 1), y,
                               pTitleShape, 1, 0, scale, 0,
                               bounds);
-#ifdef WC1_SDL
-    if (!Wc1SdlRecordSpaceSprite(
+#ifdef SDL_PORT
+    if (!SdlRecordSpaceSprite(
             &stSpaceBuffer, (short)(bounds[0] - 1), y,
             pTitleShape, 0, 0, scale, 0))
 #endif
         DrawSpriteScaled(&stSpaceBuffer, (short)(bounds[0] - 1), y,
                          pTitleShape, 0, 0, scale, 0);
-#ifdef WC1_SDL
-    if (!Wc1SdlRecordSpaceSprite(
+#ifdef SDL_PORT
+    if (!SdlRecordSpaceSprite(
             &stSpaceBuffer,
             (short)(nScreenWidth >> 1), y,
             pTitleShape, 1, 0, scale, 0))
@@ -1759,8 +1759,8 @@ void DrawTitleLogo(short distance, short y)
         DrawSpriteScaled(&stSpaceBuffer,
                          (short)(nScreenWidth >> 1), y,
                          pTitleShape, 1, 0, scale, 0);
-#ifdef WC1_SDL
-    if (!Wc1SdlRecordSpaceSprite(
+#ifdef SDL_PORT
+    if (!SdlRecordSpaceSprite(
             &stSpaceBuffer, bounds[2], y,
             pTitleShape, 2, 0, scale, 0))
 #endif

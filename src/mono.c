@@ -356,7 +356,7 @@ void MonoDebug_remove(void)
 /* Function start: 0x403DB0 */
 void SoundDebugPrintf(const char *fmt, ...)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     va_list arguments;
 
     va_start(arguments, fmt);

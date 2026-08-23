@@ -106,8 +106,8 @@ void playWAVE(const char *filename, int looping, int volume)
 /* Function start: 0x42B640 */
 void stop_all_sounds(void)
 {
-#ifdef WC1_SDL
-    Wc1SdlStopDosSoundEffects();
+#ifdef SDL_PORT
+    SdlStopDosSoundEffects();
 #endif
     ix_system_delete_all_sounds();
     ix_system_delete_all_samples();
@@ -115,7 +115,7 @@ void stop_all_sounds(void)
     if (pSnowStaticSound != 0) {
         /* The bulk delete already stops, unlinks, and frees every IxSound.
            The original's following calls therefore use a stale pointer. */
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         ix_sound_stop(pSnowStaticSound);
         ix_sound_release(pSnowStaticSound);
 #endif
@@ -255,8 +255,8 @@ void DrawLaunchDoorFrame(short distance)
             (short)((short)nScreenWidth >> 1),
             (short)((short)nScreenHeight >> 1),
             pLaunchDoorShape, 1, 0, scale, 0, bounds);
-#ifdef WC1_SDL
-        if (!Wc1SdlRecordSpaceSprite(
+#ifdef SDL_PORT
+        if (!SdlRecordSpaceSprite(
                 &stSpaceBuffer, (short)(bounds[0] - 1),
                 (short)((short)nScreenHeight >> 1),
                 pLaunchDoorShape, 0, 0, scale, 0))
@@ -265,8 +265,8 @@ void DrawLaunchDoorFrame(short distance)
             &stSpaceBuffer, (short)(bounds[0] - 1),
             (short)((short)nScreenHeight >> 1),
             pLaunchDoorShape, 0, 0, scale, 0);
-#ifdef WC1_SDL
-        if (!Wc1SdlRecordSpaceSprite(
+#ifdef SDL_PORT
+        if (!SdlRecordSpaceSprite(
                 &stSpaceBuffer,
                 (short)((short)nScreenWidth >> 1),
                 (short)((short)nScreenHeight >> 1),
@@ -277,8 +277,8 @@ void DrawLaunchDoorFrame(short distance)
             (short)((short)nScreenWidth >> 1),
             (short)((short)nScreenHeight >> 1),
             pLaunchDoorShape, 1, 0, scale, 0);
-#ifdef WC1_SDL
-        if (!Wc1SdlRecordSpaceSprite(
+#ifdef SDL_PORT
+        if (!SdlRecordSpaceSprite(
                 &stSpaceBuffer, bounds[2],
                 (short)((short)nScreenHeight >> 1),
                 pLaunchDoorShape, 2, 0, scale, 0))
@@ -450,8 +450,8 @@ unsigned int ShowCarrierLaunchSequence(signed char sceneObject)
                 (short)(nScrambleBackgroundY -
                         nViewCenterY);
             sort_object_depth();
-#ifdef WC1_SDL
-            Wc1SdlBeginSpaceFrame(
+#ifdef SDL_PORT
+            SdlBeginSpaceFrame(
                 pScreenViewportGeometry,
                 (int)cScreenViewportMode,
                 bCockpitlessView > 0,
@@ -702,7 +702,7 @@ unsigned short RewriteDiskFileGraphicsExtensions(short videoMode)
 
     while (record->name[0] != '\0') {
         extensionPosition = strrchr(record->name, '.');
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         if (extensionPosition != 0) {
             extensionPosition++;
             if (toupper((int)*extensionPosition) == 'V')
@@ -725,15 +725,15 @@ short LoadWingCmdrCfgFile(short argc, char **argv)
     short argumentCount;
     char *destination;
     short argumentIndex;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     char resolvedPath[PATH_MAX];
 #endif
 
     argumentIndex = 1;
     argumentCount = 0;
     destination = szTextScratchBuffer;
-#ifdef WC1_SDL
-    if (Wc1SdlResolvePath("WINGCMDR.CFG", resolvedPath,
+#ifdef SDL_PORT
+    if (SdlResolvePath("WINGCMDR.CFG", resolvedPath,
                           sizeof(resolvedPath)))
         file = fopen(resolvedPath, "rt");
     else
@@ -803,7 +803,7 @@ unsigned short LoadInstallDat(void)
     }
     maximumId++;
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     pDiskFileRecords =
         (DiskFileRecord *)AllocateTaggedMemory(
             sizeof(DiskFileRecord) * 78, 0);
@@ -840,9 +840,9 @@ unsigned short LoadInstallDat(void)
     }
     ReleasePacketHandle(records);
     pDiskFileRecords++;
-#ifdef WC1_SDL
-    if (Wc1SdlUsingDosData())
-        Wc1SdlCompleteDosInstallTable(pDiskFileRecords);
+#ifdef SDL_PORT
+    if (SdlUsingDosData())
+        SdlCompleteDosInstallTable(pDiskFileRecords);
 #endif
     return 0;
 }

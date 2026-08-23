@@ -74,7 +74,7 @@ void send_appropriate_message(short attacker, short victim)
                 aeSpecialManeuver[attacker] !=
                     SPECIAL_MANEUVER_UNKNOWN_9)
                 send_message(nYourWingman, 5);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         /* An unowned ship has owner -1.  The original indexes side[-1], which
            aliases the final roll-goal words and normally compares false. */
         } else if (acObjectOwner[attacker] != -1 &&
@@ -119,8 +119,8 @@ int inflict_damage(short attacker, short victim, short damage,
     } else {
         if (victim == 0) {
             TriggerPlayerHitPaletteFlash();
-#ifdef WC1_SDL
-            Wc1SdlQueueJoystickDamageRumble(damage);
+#ifdef SDL_PORT
+            SdlQueueJoystickDamageRumble(damage);
 #endif
         }
 
@@ -562,11 +562,11 @@ short ReportComponentRepaired(short component, short minimumDamage)
 void repair_internal_damage(void)
 {
     short repair;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     short component;
 #endif
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     if ((short)acPlayerComponentDamage[component] >= 4)
         return;
 #endif
@@ -575,7 +575,7 @@ void repair_internal_damage(void)
     repair = RandomBelowOrEqual(2);
     switch (repair) {
     case 0:
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         /* The Mac body guards the selected component in each repair case.
            Retail Win32 instead reads an uninitialized component above. */
         if (acPlayerComponentDamage[2] >= 4)
@@ -584,7 +584,7 @@ void repair_internal_damage(void)
         ReportComponentRepaired(2, 1);
         break;
     case 1:
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         if (acPlayerComponentDamage[0] >= 4)
             break;
 #endif
@@ -1003,7 +1003,7 @@ int explode(short attacker, short victim)
                 return 0;
         }
     }
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     /* Special-maneuver state exists only for the twelve ship slots.  The
        original evaluates this lookup before rejecting non-ship objects, so
        exploding a projectile in a later object slot reads the following
@@ -1058,7 +1058,7 @@ short find_child_object(short parent, enum ObjectClass objectClass)
             aeObjectClass[obj] == objectClass)
             return obj;
         obj++;
-    } while (obj < WC1_SPACE_OBJECT_COUNT);
+    } while (obj < SPACE_OBJECT_COUNT);
     return -1;
 }
 
@@ -1213,7 +1213,7 @@ void fire(short obj, short target)
                     ScaleFixedVector(&aShipVelocity[target],
                                      (int)mineTime, &direction);
                     interceptPoint = &aShipPosition[
-                        WC1_SPACE_OBJECT_COUNT - 1];
+                        SPACE_OBJECT_COUNT - 1];
                     AddFixedVectors(&aShipPosition[target],
                                     &direction, interceptPoint);
                     ComputeVectorDelta(
@@ -1400,7 +1400,7 @@ int fire_turrets(short obj)
 int fire_weapon(short obj, short weapon)
 {
     ObjectTypeData *weaponData;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     ShipWeaponSlot *weaponSlot;
 #endif
     enum ObjectType weaponType;
@@ -1416,7 +1416,7 @@ int fire_weapon(short obj, short weapon)
     projectileSpeed = 10;
     weaponOffset = (int)obj * sizeof(aShipWeapons[0]) +
                    (int)weapon * sizeof(ShipWeaponSlot);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     weaponSlot = (ShipWeaponSlot *)((unsigned char *)aShipWeapons +
                                    weaponOffset + 1);
     weaponType = weaponSlot->type;
@@ -1447,7 +1447,7 @@ int fire_weapon(short obj, short weapon)
                 (short)(asShipWeaponEnergy[obj] -
                         weaponData->animationDelay);
         }
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         child_object(weaponSlot->hardpoint, projectile, obj);
 #else
         child_object(*(short *)(void *)
@@ -1536,9 +1536,9 @@ int fire_weapon(short obj, short weapon)
         } else {
             asObjectCounter[obj] = 12;
         }
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         if (obj == 0)
-            Wc1SdlQueueJoystickWeaponRumble(weaponType);
+            SdlQueueJoystickWeaponRumble(weaponType);
 #endif
         switch (weaponType) {
         case OBJECT_TYPE_LASER_CANNON:

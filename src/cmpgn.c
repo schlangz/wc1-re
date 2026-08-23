@@ -70,15 +70,15 @@ unsigned short __stdcall LoadPaletteTripletsFile(const char *path)
 {
     unsigned char *palette;
     FILE *file;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     char resolvedPath[PATH_MAX];
 #endif
 
     palette = AllocateTaggedMemory(0x300, 0);
     if (palette == 0)
         return 0;
-#ifdef WC1_SDL
-    if (Wc1SdlResolvePath(path, resolvedPath, sizeof(resolvedPath)))
+#ifdef SDL_PORT
+    if (SdlResolvePath(path, resolvedPath, sizeof(resolvedPath)))
         file = fopen(resolvedPath, "rb");
     else
         file = 0;
@@ -211,20 +211,20 @@ unsigned int ejection_sequence(void)
         ReleasePacketHandle(background);
         if (bEscapePressed != 1) {
             load_all_slots();
-            aShipForwardVector[WC1_EYE_OBJECT] =
+            aShipForwardVector[EYE_OBJECT] =
                 aShipUpVector[0];
-            aShipRightVector[WC1_EYE_OBJECT] =
+            aShipRightVector[EYE_OBJECT] =
                 aShipRightVector[0];
-            aShipUpVector[WC1_EYE_OBJECT] =
+            aShipUpVector[EYE_OBJECT] =
                 aShipForwardVector[0];
-            negate_vector(&aShipUpVector[WC1_EYE_OBJECT]);
+            negate_vector(&aShipUpVector[EYE_OBJECT]);
             ScaleFixedVector(
                 &aShipUpVector[nEjectedPilotObject],
                 -0x25800, &viewOffset);
             AddFixedVectors(
                 &aShipPosition[nEjectedPilotObject],
                 &viewOffset,
-                &aShipPosition[WC1_EYE_OBJECT]);
+                &aShipPosition[EYE_OBJECT]);
             nScriptedViewObject =
                 nEjectedPilotObject;
             initialize_scripted_view(asEjectionViewScript);
@@ -834,7 +834,7 @@ unsigned int LoadMissionData(short series, short mission)
     logicalFile = asMissionDataFiles[nCampaignDataSet];
     packet = FetchDiskPacketRetrying(logicalFile, 0, 0);
     missionIndex = (int)mission + (int)series * 4;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     /* The original developer path assumes an occupied one-of-64 header.  An
      * empty header marks its player ship as -1, which cannot be represented
      * as a valid access to the 32 mission records loaded below. */
@@ -844,9 +844,9 @@ unsigned int LoadMissionData(short series, short mission)
     }
 #endif
     header = (MissionHeaderDisk *)(packet + missionIndex * 0x18);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     if (header->playerMissionShip < 0 ||
-        header->playerMissionShip >= WC1_ACTIVE_MISSION_SHIP_COUNT) {
+        header->playerMissionShip >= ACTIVE_MISSION_SHIP_COUNT) {
         ReleasePacketHandle(packet);
         return 1;
     }
@@ -866,7 +866,7 @@ unsigned int LoadMissionData(short series, short mission)
     packet = FetchDiskPacketRetrying(logicalFile, 1, 0);
     diskNav = (MissionNavPointDisk *)(packet + missionIndex * 0x4d0);
     for (index = 0;
-         index < WC1_ACTIVE_MISSION_NAV_POINT_COUNT;
+         index < ACTIVE_MISSION_NAV_POINT_COUNT;
          diskNav++, index++) {
         memcpy(aMissionNavPoints[index].name,
                diskNav->name,
@@ -893,7 +893,7 @@ unsigned int LoadMissionData(short series, short mission)
     packet = FetchDiskPacketRetrying(logicalFile, 2, 0);
     diskObjective =
         (MissionObjectiveDisk *)(packet + missionIndex * 0x400);
-    for (index = 0; index < WC1_MISSION_OBJECTIVE_COUNT;
+    for (index = 0; index < MISSION_OBJECTIVE_COUNT;
          diskObjective++, index++) {
         aMissionObjectiveSources[index].type =
             diskObjective->type;

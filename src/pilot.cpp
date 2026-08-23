@@ -163,7 +163,7 @@ void CreateDebugOverlayConsole(HINSTANCE module, HWND window,
 void DestroyGlobalDebugOverlayConsole(void)
 {
     delete pDebugOverlay;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     pDebugOverlay = 0;
 #endif
 }
@@ -171,7 +171,7 @@ void DestroyGlobalDebugOverlayConsole(void)
 /* Function start: 0x425BB0 */
 void SystemDebugPrintf(const char *format, ...)
 {
-#if defined(WC1_SDL) && defined(WC1_SDL_LEGACY_DEBUG_OUTPUT)
+#if defined(SDL_PORT) && defined(SDL_PORT_LEGACY_DEBUG_OUTPUT)
     va_list arguments;
 
     va_start(arguments, format);
@@ -609,7 +609,7 @@ short ReadTextInput(char *destination, short maximumLength,
                         if (key < '0' || key > '9')
                             character = 0;
                     }
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                     else if (isalpha((unsigned char)key)) {
 #else
                     else if (__mb_cur_max > 1

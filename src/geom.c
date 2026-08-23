@@ -170,7 +170,7 @@ void point_at(short obj, FixedVector point)
 /* Function start: 0x4183A0 */
 void look_at(short obj)
 {
-    point_at(WC1_EYE_OBJECT, aShipPosition[obj]);
+    point_at(EYE_OBJECT, aShipPosition[obj]);
 }
 
 /* Function start: 0x4183D0 */
@@ -179,7 +179,7 @@ void position_relative(FixedVector *position, FixedVector direction,
 {
     if (distance != 0) {
         NormalizeFixedVector(&direction);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         ScaleFixedVector(&direction, (int)distance * 0x100, &direction);
 #else
         ScaleFixedVector(&direction, (int)distance << 8, &direction);
@@ -357,7 +357,7 @@ short ChooseRandomSignedMagnitude(short minimum, short maximum,
 /* Function start: 0x418780 */
 void MakeRandomVectorFixed(short minimum, short maximum, FixedVector *vector)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     vector->x = ChooseRandomSignedMagnitude(minimum, maximum, 1) * 0x100;
     vector->y = ChooseRandomSignedMagnitude(minimum, maximum, 1) * 0x100;
     vector->z = ChooseRandomSignedMagnitude(minimum, maximum, 1) * 0x100;
@@ -418,7 +418,7 @@ void rectangular_to_spherical(const FixedVector *rectangular,
 void ConvertShortVectorToFixedVector(const ShortVector *source,
                                      FixedVector *destination)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     destination->x = (int)source->x * 0x100;
     destination->y = (int)source->y * 0x100;
     destination->z = (int)source->z * 0x100;
@@ -888,7 +888,7 @@ void NormalizeAndScaleVector(FixedVector *vector, int scale)
 /* Function start: 0x419970 */
 void SetVectorFixedPoint(unsigned int *p, short v)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     NormalizeAndScaleVector((FixedVector *)p, (int)v * 0x100);
 #else
     NormalizeAndScaleVector((FixedVector *)p, (int)v << 8);
@@ -936,7 +936,7 @@ short check_for_collision(short obj)
         }
         other++;
         position++;
-    } while (other <= WC1_SPACE_LAST_MOVING_OBJECT);
+    } while (other <= SPACE_LAST_MOVING_OBJECT);
     return -1;
 }
 
@@ -1175,15 +1175,15 @@ unsigned short IsPointWithinEyeViewCone(const FixedVector *point)
     long projection;
     unsigned short visible;
 
-    ComputeVectorDelta(&aShipPosition[WC1_EYE_OBJECT],
+    ComputeVectorDelta(&aShipPosition[EYE_OBJECT],
                        (FixedVector *)point, &direction);
     distance = Vector_magnitude(&direction);
-    if (asObjectCollisionRadius[WC1_EYE_OBJECT] * 0x100 >
+    if (asObjectCollisionRadius[EYE_OBJECT] * 0x100 >
         distance)
         return 0;
     transform_to_objects_frame(&direction, &viewPosition,
-                               WC1_EYE_OBJECT);
-    if (asObjectCollisionRadius[WC1_EYE_OBJECT] * 0x100 >
+                               EYE_OBJECT);
+    if (asObjectCollisionRadius[EYE_OBJECT] * 0x100 >
         viewPosition.z)
         return 0;
     projection = DivideFixed(viewPosition.z, distance);
@@ -1206,7 +1206,7 @@ void transform_objects_to_your_view(void)
 
     nClosestVisibleObject = -1;
     draw_nav_pointer();
-    for (obj = 0; obj <= WC1_SPACE_LAST_MOVING_OBJECT; obj++) {
+    for (obj = 0; obj <= SPACE_LAST_MOVING_OBJECT; obj++) {
         objectIndex = (int)obj;
         if (aeObjectClass[objectIndex] != OBJECT_CLASS_NULL &&
             aeObjectClass[objectIndex] !=
@@ -1225,13 +1225,13 @@ void transform_objects_to_your_view(void)
                 aeObjectClass[objectIndex] == OBJECT_CLASS_STAR) {
                 direction = aShipPosition[objectIndex];
             } else {
-                ComputeVectorDelta(&aShipPosition[WC1_EYE_OBJECT],
+                ComputeVectorDelta(&aShipPosition[EYE_OBJECT],
                                    &aShipPosition[objectIndex],
                                    &direction);
             }
             distance = Vector_magnitude(&direction);
             if (distance <
-                asObjectCollisionRadius[WC1_EYE_OBJECT] * 0x100) {
+                asObjectCollisionRadius[EYE_OBJECT] * 0x100) {
                 asObjectScreenX[objectIndex] = (short)0x8001;
                 continue;
             }
@@ -1243,9 +1243,9 @@ void transform_objects_to_your_view(void)
             transform_to_objects_frame(&direction,
                                        &aObjectViewPosition[
                                            objectIndex],
-                                       WC1_EYE_OBJECT);
+                                       EYE_OBJECT);
             if (aObjectViewPosition[objectIndex].z <
-                asObjectCollisionRadius[WC1_EYE_OBJECT] * 0x100) {
+                asObjectCollisionRadius[EYE_OBJECT] * 0x100) {
                 asObjectScreenX[objectIndex] = (short)0x8001;
                 continue;
             }
@@ -1297,7 +1297,7 @@ void transform_objects_to_your_view(void)
             case OBJECT_CLASS_DUST:
                 dustSize = (short)(MultiplyFixed(
                     0x900, DivideFixed(
-                        asObjectCollisionRadius[WC1_EYE_OBJECT] << 8,
+                        asObjectCollisionRadius[EYE_OBJECT] << 8,
                         distance)) >> 8);
                 if (dustSize > 3)
                     dustSize = 3;
@@ -1330,9 +1330,9 @@ void set_background_objects_rotation(short obj, FixedVector *direction)
     init_ijk(63);
     alter_yaw((short)-spherical.yaw, 63);
     alter_pitch((short)-spherical.pitch, 63);
-    projectedUp.x = dot_product(&aShipUpVector[WC1_EYE_OBJECT],
+    projectedUp.x = dot_product(&aShipUpVector[EYE_OBJECT],
                                 &aShipRightVector[63]);
-    projectedUp.y = dot_product(&aShipUpVector[WC1_EYE_OBJECT],
+    projectedUp.y = dot_product(&aShipUpVector[EYE_OBJECT],
                                 &aShipUpVector[63]);
     projectedUp.z = 0;
     NormalizeFixedVector(&projectedUp);
@@ -1370,7 +1370,7 @@ void get_right_shape(short obj, FixedVector *direction)
     NormalizeFixedVector(&up);
     NormalizeFixedVector(&forward);
     transform_to_objects_frame(&forward, &objectForward, obj);
-    transform_to_objects_frame(&aShipUpVector[WC1_EYE_OBJECT],
+    transform_to_objects_frame(&aShipUpVector[EYE_OBJECT],
                                &eyeUp, obj);
     rectangular_to_spherical(&objectForward, &spherical);
     pitchBand = (short)(spherical.pitch / 30 + 3);
@@ -1413,9 +1413,9 @@ void get_right_shape(short obj, FixedVector *direction)
     type = aeObjectType[obj];
     if (objectClass == OBJECT_CLASS_MISSILE ||
         type == OBJECT_TYPE_TURRET) {
-        directionIndex += WC1_DIRECTION_VIEW_COUNT;
+        directionIndex += DIRECTION_VIEW_COUNT;
     } else if (type == OBJECT_TYPE_KILRATHI_BASE) {
-        directionIndex += WC1_DIRECTION_VIEW_COUNT * 2;
+        directionIndex += DIRECTION_VIEW_COUNT * 2;
     }
     frame = acDirectionShapeFrame[directionIndex];
     if (frame == 0)
@@ -1507,7 +1507,7 @@ void DrawModalTextPanel(ModalTextPanel *panel, short x, short y,
 {
     char text[84];
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     va_list arguments;
 
     va_start(arguments, format);
@@ -1539,7 +1539,7 @@ short ShowModalTextPanel(short fontIndex, const char *format, ...)
     short halfWidth;
     char text[52];
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     va_list arguments;
 
     va_start(arguments, format);

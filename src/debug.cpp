@@ -18,7 +18,7 @@ DebugOverlayConsole::DebugOverlayConsole(HINSTANCE module,
                                          int rowCount,
                                          int waitMode)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     TEXTMETRICA metrics;
     HDC deviceContext;
 #endif
@@ -35,7 +35,7 @@ DebugOverlayConsole::DebugOverlayConsole(HINSTANCE module,
     memset(textBuffer, ' ', rows * columns);
     memset(dirtyLines, 1, rows);
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     (void)module;
     characterWidth = 8;
     characterHeight = 10;
@@ -48,7 +48,7 @@ DebugOverlayConsole::DebugOverlayConsole(HINSTANCE module,
     backgroundColor = 0;
     textColor = 0xffffff;
     backgroundMode = OPAQUE;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     GetTextMetricsA(deviceContext, &metrics);
     SetTextColor(deviceContext, 0xffffff);
     SetBkColor(deviceContext, 0);
@@ -63,7 +63,7 @@ DebugOverlayConsole::DebugOverlayConsole(HINSTANCE module,
     }
 #endif
     reverseVideo = 0;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     mutex = 0;
 #else
     mutex = CreateMutexA(0, FALSE, 0);
@@ -78,7 +78,7 @@ DebugOverlayConsole::DebugOverlayConsole(HINSTANCE module,
 DebugOverlayConsole::~DebugOverlayConsole()
 {
     animationState = 2;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     nDebugOverlayConsoleCount--;
 #else
     if (--nDebugOverlayConsoleCount == 0)
@@ -93,7 +93,7 @@ DebugOverlayConsole::~DebugOverlayConsole()
 extern "C" DWORD WINAPI DebugOverlayWorkerProc(void *parameter)
 {
     DebugOverlayConsole *console;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     /* Retail compares against this stack slot before its first assignment. */
     DWORD timer;
     DWORD waitResult;
@@ -101,7 +101,7 @@ extern "C" DWORD WINAPI DebugOverlayWorkerProc(void *parameter)
 #endif
 
     console = (DebugOverlayConsole *)parameter;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     while (console->animationState != 2)
         SDL_Delay(10);
     return 0;
@@ -141,7 +141,7 @@ extern "C" DWORD WINAPI DebugOverlayWorkerProc(void *parameter)
 extern "C" LRESULT CALLBACK DebugKeyboardHookProc(int code, WPARAM key,
                                                     LPARAM flags)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     (void)code;
     if ((flags & 0x40000000) != 0) {
         dwDebugOverlayKey = (DWORD)key;
@@ -195,7 +195,7 @@ extern "C" void DebugOverlayPrintf(DebugOverlayConsole *console,
         } else {
             switch (character) {
             case '\a':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 fputc('\a', stderr);
 #else
                 Beep(0, 0);
@@ -248,7 +248,7 @@ void DebugOverlayConsole::Scroll(void)
 /* Function start: 0x41CCC0 */
 void DebugOverlayConsole::DrawPendingLines(void)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     HDC deviceContext;
     int row;
 
@@ -269,7 +269,7 @@ void DebugOverlayConsole::DrawPendingLines(void)
 /* Function start: 0x41CD40 */
 char DebugOverlayConsole::WaitForKey(void)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     char key;
 
     while (dwDebugOverlayKey == 0 &&
@@ -362,18 +362,18 @@ char DebugOverlayConsole::WaitForKey(void)
 /* Function start: 0x41CF00 */
 void DebugOverlayConsole::EnableReverseVideo(void)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     HDC deviceContext;
 #endif
 
     if (reverseVideo == 0) {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         deviceContext = GetDC(window);
         SetBkColor(deviceContext, textColor);
         SetTextColor(deviceContext, backgroundColor);
 #endif
         reverseVideo = 1;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         ReleaseDC(window, deviceContext);
 #endif
     }
@@ -382,18 +382,18 @@ void DebugOverlayConsole::EnableReverseVideo(void)
 /* Function start: 0x41CF50 */
 void DebugOverlayConsole::DisableReverseVideo(void)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     HDC deviceContext;
 #endif
 
     if (reverseVideo != 0) {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         deviceContext = GetDC(window);
         SetTextColor(deviceContext, textColor);
         SetBkColor(deviceContext, backgroundColor);
 #endif
         reverseVideo = 0;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         ReleaseDC(window, deviceContext);
 #endif
     }
@@ -402,13 +402,13 @@ void DebugOverlayConsole::DisableReverseVideo(void)
 /* Function start: 0x41CFA0 */
 void DebugOverlayConsole::SetOverlayTextColor(int red, int green, int blue)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     HDC deviceContext;
 
     deviceContext = GetDC(window);
 #endif
     textColor = red + (blue * 0x100 + green) * 0x100;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     SetTextColor(deviceContext, textColor);
     ReleaseDC(window, deviceContext);
 #endif
@@ -418,13 +418,13 @@ void DebugOverlayConsole::SetOverlayTextColor(int red, int green, int blue)
 void DebugOverlayConsole::SetOverlayBackgroundColor(int red, int green,
                                                     int blue)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     HDC deviceContext;
 
     deviceContext = GetDC(window);
 #endif
     backgroundColor = red + (blue * 0x100 + green) * 0x100;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     SetBkColor(deviceContext, backgroundColor);
     ReleaseDC(window, deviceContext);
 #endif
@@ -433,12 +433,12 @@ void DebugOverlayConsole::SetOverlayBackgroundColor(int red, int green,
 /* Function start: 0x41D040 */
 void DebugOverlayConsole::SetTransparentBackground(void)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     HDC deviceContext;
 #endif
 
     backgroundMode = TRANSPARENT;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     deviceContext = GetDC(window);
     SetBkMode(deviceContext, backgroundMode);
     ReleaseDC(window, deviceContext);
@@ -448,12 +448,12 @@ void DebugOverlayConsole::SetTransparentBackground(void)
 /* Function start: 0x41D080 */
 void DebugOverlayConsole::SetOpaqueBackground(void)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     HDC deviceContext;
 #endif
 
     backgroundMode = OPAQUE;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     deviceContext = GetDC(window);
     SetBkMode(deviceContext, backgroundMode);
     ReleaseDC(window, deviceContext);

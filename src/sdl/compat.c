@@ -12,7 +12,7 @@
 #include <strings.h>
 #include <sys/stat.h>
 
-static int Wc1SdlAppendPathComponent(char *path, size_t pathSize,
+static int SdlAppendPathComponent(char *path, size_t pathSize,
                                      const char *component)
 {
     size_t componentLength;
@@ -30,7 +30,7 @@ static int Wc1SdlAppendPathComponent(char *path, size_t pathSize,
     return 1;
 }
 
-static int Wc1SdlAppendResolvedComponent(char *path, size_t pathSize,
+static int SdlAppendResolvedComponent(char *path, size_t pathSize,
                                          const char *component)
 {
     DIR *directory;
@@ -38,23 +38,23 @@ static int Wc1SdlAppendResolvedComponent(char *path, size_t pathSize,
     int result;
 
     if (strcmp(component, ".") == 0 || strcmp(component, "..") == 0)
-        return Wc1SdlAppendPathComponent(path, pathSize, component);
+        return SdlAppendPathComponent(path, pathSize, component);
     directory = opendir(path);
     if (directory == 0)
-        return Wc1SdlAppendPathComponent(path, pathSize, component);
+        return SdlAppendPathComponent(path, pathSize, component);
     while ((entry = readdir(directory)) != 0) {
         if (strcasecmp(entry->d_name, component) == 0) {
-            result = Wc1SdlAppendPathComponent(path, pathSize,
+            result = SdlAppendPathComponent(path, pathSize,
                                                entry->d_name);
             closedir(directory);
             return result;
         }
     }
     closedir(directory);
-    return Wc1SdlAppendPathComponent(path, pathSize, component);
+    return SdlAppendPathComponent(path, pathSize, component);
 }
 
-int Wc1SdlResolvePath(const char *path, char *resolved,
+int SdlResolvePath(const char *path, char *resolved,
                       unsigned long resolvedSize)
 {
     char component[PATH_MAX];
@@ -95,7 +95,7 @@ int Wc1SdlResolvePath(const char *path, char *resolved,
             return 0;
         memcpy(component, cursor, componentLength);
         component[componentLength] = '\0';
-        if (!Wc1SdlAppendResolvedComponent(prefix, sizeof(prefix), component))
+        if (!SdlAppendResolvedComponent(prefix, sizeof(prefix), component))
             return 0;
         cursor = end;
         while (*cursor == '/')
@@ -108,16 +108,16 @@ int Wc1SdlResolvePath(const char *path, char *resolved,
     return 1;
 }
 
-int Wc1SdlChangeDirectory(const char *path)
+int SdlChangeDirectory(const char *path)
 {
     char resolved[PATH_MAX];
 
-    if (!Wc1SdlResolvePath(path, resolved, sizeof(resolved)))
+    if (!SdlResolvePath(path, resolved, sizeof(resolved)))
         return -1;
     return chdir(resolved);
 }
 
-int Wc1SdlOpen(const char *path, int flags, ...)
+int SdlOpen(const char *path, int flags, ...)
 {
     int hostFlags;
     int hostMode;
@@ -149,7 +149,7 @@ int Wc1SdlOpen(const char *path, int flags, ...)
             hostMode |= S_IWUSR;
     }
 
-    if (!Wc1SdlResolvePath(path, hostPath, sizeof(hostPath)))
+    if (!SdlResolvePath(path, hostPath, sizeof(hostPath)))
         return -1;
     file = open(hostPath, hostFlags, hostMode);
     if (file == -1 && (hostFlags & O_ACCMODE) == O_RDWR &&
@@ -160,7 +160,7 @@ int Wc1SdlOpen(const char *path, int flags, ...)
     return file;
 }
 
-long Wc1SdlFileLength(int file)
+long SdlFileLength(int file)
 {
     struct stat status;
 
@@ -169,7 +169,7 @@ long Wc1SdlFileLength(int file)
     return (long)status.st_size;
 }
 
-static char *Wc1SdlLowercaseDigits(char *text)
+static char *SdlLowercaseDigits(char *text)
 {
     char *cursor;
 
@@ -181,33 +181,33 @@ static char *Wc1SdlLowercaseDigits(char *text)
     return text;
 }
 
-char *Wc1SdlItoa(int value, char *text, int radix)
+char *SdlItoa(int value, char *text, int radix)
 {
-    return Wc1SdlLtoa((long)value, text, radix);
+    return SdlLtoa((long)value, text, radix);
 }
 
-char *Wc1SdlLtoa(long value, char *text, int radix)
+char *SdlLtoa(long value, char *text, int radix)
 {
     if (radix == 10)
         return SDL_ltoa(value, text, radix);
     else if (radix == 16)
-        return Wc1SdlLowercaseDigits(
+        return SdlLowercaseDigits(
             SDL_ultoa((unsigned long)value, text, radix));
     text[0] = '\0';
     return text;
 }
 
-char *Wc1SdlUltoa(unsigned long value, char *text, int radix)
+char *SdlUltoa(unsigned long value, char *text, int radix)
 {
     if (radix == 10)
         return SDL_ultoa(value, text, radix);
     else if (radix == 16)
-        return Wc1SdlLowercaseDigits(SDL_ultoa(value, text, radix));
+        return SdlLowercaseDigits(SDL_ultoa(value, text, radix));
     text[0] = '\0';
     return text;
 }
 
-char *Wc1SdlStrupr(char *text)
+char *SdlStrupr(char *text)
 {
     char *cursor;
 
@@ -221,12 +221,12 @@ char *Wc1SdlStrupr(char *text)
 
 #else
 
-int Wc1SdlChangeDirectory(const char *path)
+int SdlChangeDirectory(const char *path)
 {
     return _chdir(path);
 }
 
-int Wc1SdlResolvePath(const char *path, char *resolved,
+int SdlResolvePath(const char *path, char *resolved,
                       unsigned long resolvedSize)
 {
     size_t pathLength;

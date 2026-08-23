@@ -162,7 +162,7 @@ void PrepareShapeRLEData(unsigned char *shape)
         exit_squadron(szShapeRLEOverflow);
     preparedShape = AllocateTaggedMemory(preparedSize, 0);
     memcpy(preparedShape, abShapeRLEScratch, preparedSize);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     *(unsigned char **)(shape - 8 - sizeof(unsigned char *)) = preparedShape;
 #else
     *(unsigned char **)(shape - 4) = preparedShape;
@@ -344,7 +344,7 @@ void CaptureSpriteBackground(Viewport *viewport, unsigned char *background,
     int skip;
     unsigned short count;
     unsigned short runLength;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     short coordinate;
 #endif
 
@@ -363,7 +363,7 @@ void CaptureSpriteBackground(Viewport *viewport, unsigned char *background,
     top = viewport->top;
     bottom = viewport->bottom;
     commands = shape + *(int *)(shape + frameOffset) + 8;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     memcpy(&count, commands, sizeof(count));
 #else
     count = *(unsigned short *)commands;
@@ -371,7 +371,7 @@ void CaptureSpriteBackground(Viewport *viewport, unsigned char *background,
     pixels = viewport->pixels;
     commands += 2;
     while (count != 0) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         memcpy(&coordinate, commands, sizeof(coordinate));
         drawX = x + coordinate;
         commands += 2;
@@ -384,7 +384,7 @@ void CaptureSpriteBackground(Viewport *viewport, unsigned char *background,
         drawY = y + *(short *)commands;
         commands += 2;
 #endif
-        screen = pixels + (WC1_SPRITE_ROW_OFFSET(viewport, drawY) + drawX);
+        screen = pixels + (SPRITE_ROW_OFFSET(viewport, drawY) + drawX);
         if ((count & 1) != 0) {
             count >>= 1;
             while (count != 0) {
@@ -448,7 +448,7 @@ void CaptureSpriteBackground(Viewport *viewport, unsigned char *background,
             }
             commands += count;
         }
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         memcpy(&count, commands, sizeof(count));
 #else
         count = *(unsigned short *)commands;
@@ -479,7 +479,7 @@ void RestoreSpriteBackground(Viewport *viewport, unsigned char *background,
     int skip;
     unsigned short count;
     unsigned short runLength;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     short coordinate;
 #endif
 
@@ -498,7 +498,7 @@ void RestoreSpriteBackground(Viewport *viewport, unsigned char *background,
     top = viewport->top;
     bottom = viewport->bottom;
     commands = shape + *(int *)(shape + frameOffset) + 8;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     memcpy(&count, commands, sizeof(count));
 #else
     count = *(unsigned short *)commands;
@@ -506,7 +506,7 @@ void RestoreSpriteBackground(Viewport *viewport, unsigned char *background,
     pixels = viewport->pixels;
     commands += 2;
     while (count != 0) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         memcpy(&coordinate, commands, sizeof(coordinate));
         drawX = x + coordinate;
         commands += 2;
@@ -519,7 +519,7 @@ void RestoreSpriteBackground(Viewport *viewport, unsigned char *background,
         drawY = y + *(short *)commands;
         commands += 2;
 #endif
-        screen = pixels + (WC1_SPRITE_ROW_OFFSET(viewport, drawY) + drawX);
+        screen = pixels + (SPRITE_ROW_OFFSET(viewport, drawY) + drawX);
         if ((count & 1) != 0) {
             count >>= 1;
             while (count != 0) {
@@ -583,7 +583,7 @@ void RestoreSpriteBackground(Viewport *viewport, unsigned char *background,
             }
             commands += count;
         }
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         memcpy(&count, commands, sizeof(count));
 #else
         count = *(unsigned short *)commands;
@@ -881,12 +881,12 @@ void fizzle_fade(Viewport *source, Viewport *destination,
 /* Function start: 0x442300 */
 void snow_viewport(Viewport *viewport, int effect, unsigned short colour)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     /* Retail draws nothing here: the Kilrathi Saga port emptied the body
      * down to the DIB slam and the RasterLineHook name marker, which is
      * why a knocked-out display shows no static even though malf_noise
      * still plays the sound. */
-    Wc1SdlDrawViewportStatic(viewport, effect, colour);
+    SdlDrawViewportStatic(viewport, effect, colour);
 #else
     (void)effect;
     (void)colour;

@@ -22,11 +22,11 @@ void WaitForKeyAcknowledge(int mode)
     int acknowledged;
     int key;
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     /* Every modal wait blocks here, including both pause paths: Ctrl+P
      * calls this directly and P reaches it through ShowOnScreenMessage's
      * 9999 duration.  Free the pointer for the duration of the wait. */
-    Wc1SdlSuspendMouseGrab();
+    SdlSuspendMouseGrab();
 #endif
     if (mode != 0) {
         acknowledged = 0;
@@ -45,8 +45,8 @@ void WaitForKeyAcknowledge(int mode)
         } while (acknowledged == 0);
         FlushInputEvents();
         ClearDebugPauseFlags();
-#ifdef WC1_SDL
-        Wc1SdlResumeMouseGrab();
+#ifdef SDL_PORT
+        SdlResumeMouseGrab();
 #endif
         return;
     }
@@ -56,8 +56,8 @@ void WaitForKeyAcknowledge(int mode)
         key = PumpMessagesDuringWait();
     } while (key == 0x19 || key == 0x50 || key == 0x0c);
     FlushInputEvents();
-#ifdef WC1_SDL
-    Wc1SdlResumeMouseGrab();
+#ifdef SDL_PORT
+    SdlResumeMouseGrab();
 #endif
 }
 
@@ -66,7 +66,7 @@ void ShowModalMessage(const char *format, ...)
 {
     char text[52];
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     va_list arguments;
 
     va_start(arguments, format);
@@ -99,7 +99,7 @@ void ShowOnScreenMessage(int flags, short duration,
     short modalShown = 0;
     char text[52];
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     va_list arguments;
 
     va_start(arguments, format);
@@ -482,7 +482,7 @@ primary_controls_complete:
             CloseCommChoiceMenu();
             return 0;
         }
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         /* The original leaves Escape inert in flight, leaving no way to
          * halt a mission.  Pause on it, exactly as the pause key does. */
         ShowGamePausedBanner(1);
@@ -635,8 +635,8 @@ unsigned int Draw_3Space_Frame(void)
     place_exhaust_on_ships();
     reposition_fixed_child_objects();
     sort_object_depth();
-#ifdef WC1_SDL
-    Wc1SdlBeginSpaceFrame(
+#ifdef SDL_PORT
+    SdlBeginSpaceFrame(
         pScreenViewportGeometry,
         (int)cScreenViewportMode,
         bCockpitlessView > 0,
@@ -775,7 +775,7 @@ short FindNearestNavPoint(short ship)
             return navPointIndex;
         navPointIndex++;
         navPoint++;
-    } while (navPointIndex < WC1_ACTIVE_MISSION_NAV_POINT_COUNT);
+    } while (navPointIndex < ACTIVE_MISSION_NAV_POINT_COUNT);
 
     return nCurrentNavPoint;
 }
@@ -803,8 +803,8 @@ int RunSpaceFlight(short entryNavPoint)
         bCockpitlessView = 1;
     nFrameSkipCounter = 1;
     bInputMode = 1;
-#ifdef WC1_SDL
-    Wc1SdlSetMouseGrab(1);
+#ifdef SDL_PORT
+    SdlSetMouseGrab(1);
 #endif
     SetEventManagerPump(get_player_input);
     savedViewport = (Viewport *)stMouseCursorState.viewport;
@@ -903,11 +903,11 @@ int RunSpaceFlight(short entryNavPoint)
         DAT_00598890 = 0;
     }
 
-#ifdef WC1_SDL
-    Wc1SdlSetMouseGrab(0);
-    Wc1SdlCancelSpaceFrame();
-    if (Wc1SdlUsingDosData())
-        Wc1SdlStopDosSoundEffects();
+#ifdef SDL_PORT
+    SdlSetMouseGrab(0);
+    SdlCancelSpaceFrame();
+    if (SdlUsingDosData())
+        SdlStopDosSoundEffects();
 #endif
     SetCinematicFrameTiming();
     SetViewportRect(&stSpaceBuffer, 0, 0,

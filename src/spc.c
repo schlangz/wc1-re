@@ -207,7 +207,7 @@ void SetFleetOverviewView(int initializeCockpit)
             initialize_cockpit(4);
         else
             initialize_cockpit(6);
-        zero_vector(&aShipVelocity[WC1_EYE_OBJECT]);
+        zero_vector(&aShipVelocity[EYE_OBJECT]);
     }
 
     object = 0;
@@ -271,14 +271,14 @@ void SetFleetOverviewView(int initializeCockpit)
     AddFixedVectors(&aShipPosition[63], &offset,
                     &aShipPosition[63]);
 
-    aShipPosition[WC1_EYE_OBJECT] =
+    aShipPosition[EYE_OBJECT] =
         aShipPosition[63];
-    aShipRightVector[WC1_EYE_OBJECT] = orientation;
-    aShipUpVector[WC1_EYE_OBJECT] = orientation;
+    aShipRightVector[EYE_OBJECT] = orientation;
+    aShipUpVector[EYE_OBJECT] = orientation;
     if (maximumRange < 0x271000)
-        point_at(WC1_EYE_OBJECT, centre);
+        point_at(EYE_OBJECT, centre);
     else
-        point_at(WC1_EYE_OBJECT, aShipPosition[0]);
+        point_at(EYE_OBJECT, aShipPosition[0]);
 }
 
 /* Function start: 0x410A30 */
@@ -325,52 +325,52 @@ unsigned int set_eye_direction_and_position(void)
 
     switch (nCameraViewMode) {
     case 0:
-        copy_frame(0, WC1_EYE_OBJECT);
-        aShipVelocity[WC1_EYE_OBJECT] =
+        copy_frame(0, EYE_OBJECT);
+        aShipVelocity[EYE_OBJECT] =
             aShipVelocity[0];
-        aShipPosition[WC1_EYE_OBJECT] =
+        aShipPosition[EYE_OBJECT] =
             aShipPosition[0];
         return 0;
     case 1:
-        aShipRightVector[WC1_EYE_OBJECT] =
+        aShipRightVector[EYE_OBJECT] =
             aShipForwardVector[0];
-        negate_vector(&aShipRightVector[WC1_EYE_OBJECT]);
-        aShipUpVector[WC1_EYE_OBJECT] =
+        negate_vector(&aShipRightVector[EYE_OBJECT]);
+        aShipUpVector[EYE_OBJECT] =
             aShipUpVector[0];
-        aShipForwardVector[WC1_EYE_OBJECT] =
+        aShipForwardVector[EYE_OBJECT] =
             aShipRightVector[0];
-        aShipVelocity[WC1_EYE_OBJECT] =
+        aShipVelocity[EYE_OBJECT] =
             aShipVelocity[0];
-        aShipPosition[WC1_EYE_OBJECT] =
+        aShipPosition[EYE_OBJECT] =
             aShipPosition[0];
         return 0;
     case 2:
-        aShipRightVector[WC1_EYE_OBJECT] =
+        aShipRightVector[EYE_OBJECT] =
             aShipForwardVector[0];
-        aShipUpVector[WC1_EYE_OBJECT] =
+        aShipUpVector[EYE_OBJECT] =
             aShipUpVector[0];
-        aShipForwardVector[WC1_EYE_OBJECT] =
+        aShipForwardVector[EYE_OBJECT] =
             aShipRightVector[0];
-        negate_vector(&aShipForwardVector[WC1_EYE_OBJECT]);
-        aShipVelocity[WC1_EYE_OBJECT] =
+        negate_vector(&aShipForwardVector[EYE_OBJECT]);
+        aShipVelocity[EYE_OBJECT] =
             aShipVelocity[0];
-        aShipPosition[WC1_EYE_OBJECT] =
+        aShipPosition[EYE_OBJECT] =
             aShipPosition[0];
         return 0;
     case 3:
-        copy_frame(0, WC1_EYE_OBJECT);
-        negate_vector(&aShipRightVector[WC1_EYE_OBJECT]);
-        negate_vector(&aShipForwardVector[WC1_EYE_OBJECT]);
-        aShipVelocity[WC1_EYE_OBJECT] =
+        copy_frame(0, EYE_OBJECT);
+        negate_vector(&aShipRightVector[EYE_OBJECT]);
+        negate_vector(&aShipForwardVector[EYE_OBJECT]);
+        aShipVelocity[EYE_OBJECT] =
             aShipVelocity[0];
-        aShipPosition[WC1_EYE_OBJECT] =
+        aShipPosition[EYE_OBJECT] =
             aShipPosition[0];
         return 0;
     case 4:
         if (aeObjectClass[cViewObject] !=
             OBJECT_CLASS_NULL) {
             ComputeVectorDelta(
-                &aShipPosition[WC1_EYE_OBJECT],
+                &aShipPosition[EYE_OBJECT],
                 &aShipPosition[cViewObject],
                 &viewDirection);
             desiredPosition = aShipForwardVector[0];
@@ -382,81 +382,81 @@ unsigned int set_eye_direction_and_position(void)
                 &aShipPosition[cViewObject],
                 &desiredPosition);
             ComputeVectorDelta(
-                &aShipPosition[WC1_EYE_OBJECT],
+                &aShipPosition[EYE_OBJECT],
                 &desiredPosition, &positionDelta);
             vector = positionDelta;
             divide_vector(
                 &vector,
                 (bAlternateChaseView == 0 ? 25 : 7) << 8,
                 &vector);
-            aShipVelocity[WC1_EYE_OBJECT] = vector;
-            aShipForwardVector[WC1_EYE_OBJECT] = viewDirection;
+            aShipVelocity[EYE_OBJECT] = vector;
+            aShipForwardVector[EYE_OBJECT] = viewDirection;
             shrink_vector(
-                &aShipForwardVector[WC1_EYE_OBJECT]);
-            fix_objects_ijk(WC1_EYE_OBJECT);
+                &aShipForwardVector[EYE_OBJECT]);
+            fix_objects_ijk(EYE_OBJECT);
             nEyeRollGoal = match_roll_orientation(
-                WC1_EYE_OBJECT, (short)cViewObject);
+                EYE_OBJECT, (short)cViewObject);
             if (nEyeRollGoal != 0) {
                 if (abs((int)nEyeRollGoal) < 5) {
-                    aShipUpVector[WC1_EYE_OBJECT] =
+                    aShipUpVector[EYE_OBJECT] =
                         aShipUpVector[0];
                     nEyeRollGoal = 0;
                 } else {
                     nEyeRollRate = 4;
                     rotate_eye_to_goal();
-                    rotate_object(WC1_EYE_OBJECT);
+                    rotate_object(EYE_OBJECT);
                 }
             }
         }
-        AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT],
-                        &aShipVelocity[WC1_EYE_OBJECT],
-                        &aShipPosition[WC1_EYE_OBJECT]);
+        AddFixedVectors(&aShipPosition[EYE_OBJECT],
+                        &aShipVelocity[EYE_OBJECT],
+                        &aShipPosition[EYE_OBJECT]);
         return 0;
     case 5:
-        zero_vector(&aShipVelocity[WC1_EYE_OBJECT]);
+        zero_vector(&aShipVelocity[EYE_OBJECT]);
         ComputeVectorDelta(
-            &aShipPosition[WC1_EYE_OBJECT],
+            &aShipPosition[EYE_OBJECT],
             &aShipPosition[cViewObject], &vector);
         magnitude = Vector_magnitude(&vector);
         if (magnitude < 0x7d001) {
-            aShipForwardVector[WC1_EYE_OBJECT] = vector;
-            fix_objects_ijk(WC1_EYE_OBJECT);
+            aShipForwardVector[EYE_OBJECT] = vector;
+            fix_objects_ijk(EYE_OBJECT);
             return 0;
         }
         vector = aShipVelocity[cViewObject];
         NormalizeFixedVector(&vector);
-        aShipUpVector[WC1_EYE_OBJECT] =
+        aShipUpVector[EYE_OBJECT] =
             aShipUpVector[cViewObject];
-        if (vector.x == aShipUpVector[WC1_EYE_OBJECT].x &&
-            vector.y == aShipUpVector[WC1_EYE_OBJECT].y &&
-            vector.z == aShipUpVector[WC1_EYE_OBJECT].z) {
-            aShipUpVector[WC1_EYE_OBJECT] =
+        if (vector.x == aShipUpVector[EYE_OBJECT].x &&
+            vector.y == aShipUpVector[EYE_OBJECT].y &&
+            vector.z == aShipUpVector[EYE_OBJECT].z) {
+            aShipUpVector[EYE_OBJECT] =
                 aShipRightVector[cViewObject];
         }
         ScaleFixedVector(&vector, -0x12430, &vector);
         AddFixedVectors(
             &aShipPosition[cViewObject], &vector,
-            &aShipPosition[WC1_EYE_OBJECT]);
-        aShipForwardVector[WC1_EYE_OBJECT] = vector;
-        fix_objects_ijk(WC1_EYE_OBJECT);
-        ScaleFixedVector(&aShipRightVector[WC1_EYE_OBJECT],
+            &aShipPosition[EYE_OBJECT]);
+        aShipForwardVector[EYE_OBJECT] = vector;
+        fix_objects_ijk(EYE_OBJECT);
+        ScaleFixedVector(&aShipRightVector[EYE_OBJECT],
                          0x19000, &vector);
-        AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT], &vector,
-                        &aShipPosition[WC1_EYE_OBJECT]);
-        ScaleFixedVector(&aShipUpVector[WC1_EYE_OBJECT],
+        AddFixedVectors(&aShipPosition[EYE_OBJECT], &vector,
+                        &aShipPosition[EYE_OBJECT]);
+        ScaleFixedVector(&aShipUpVector[EYE_OBJECT],
                          0x6400, &vector);
-        AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT], &vector,
-                        &aShipPosition[WC1_EYE_OBJECT]);
+        AddFixedVectors(&aShipPosition[EYE_OBJECT], &vector,
+                        &aShipPosition[EYE_OBJECT]);
         ComputeVectorDelta(
-            &aShipPosition[WC1_EYE_OBJECT],
+            &aShipPosition[EYE_OBJECT],
             &aShipPosition[cViewObject], &vector);
-        aShipForwardVector[WC1_EYE_OBJECT] = vector;
-        fix_objects_ijk(WC1_EYE_OBJECT);
+        aShipForwardVector[EYE_OBJECT] = vector;
+        fix_objects_ijk(EYE_OBJECT);
         generate_stars();
         return 0;
     case 6:
         if (nExternalViewShip == -1) {
-            zero_vector(&aShipVelocity[WC1_EYE_OBJECT]);
+            zero_vector(&aShipVelocity[EYE_OBJECT]);
             if (nExternalViewAngle++ > 20) {
                 if (bCockpitlessView == 0) {
                     new_view(0, 0);
@@ -475,7 +475,7 @@ unsigned int set_eye_direction_and_position(void)
             }
         } else {
             ComputeVectorDelta(
-                &aShipPosition[WC1_EYE_OBJECT],
+                &aShipPosition[EYE_OBJECT],
                 &aShipPosition[nExternalViewShip],
                 &vector);
             if (aeShipTactic[nExternalViewShip] !=
@@ -487,42 +487,42 @@ unsigned int set_eye_direction_and_position(void)
                     ScaleFixedVector(&adjustment, -64000, &adjustment);
                     AddFixedVectors(
                         &vector, &adjustment,
-                        &aShipVelocity[WC1_EYE_OBJECT]);
+                        &aShipVelocity[EYE_OBJECT]);
                 } else {
                     divide_vector(
                         &vector,
                         (int)(short)(nExternalViewDistance &
                                      0xfffe) << 7,
-                        &aShipVelocity[WC1_EYE_OBJECT]);
+                        &aShipVelocity[EYE_OBJECT]);
                     nExternalViewDistance = MaxShort(
                         (short)(nExternalViewDistance - 1), 8);
                 }
             }
-            aShipForwardVector[WC1_EYE_OBJECT] = vector;
-            fix_objects_ijk(WC1_EYE_OBJECT);
+            aShipForwardVector[EYE_OBJECT] = vector;
+            fix_objects_ijk(EYE_OBJECT);
         }
-        AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT],
-                        &aShipVelocity[WC1_EYE_OBJECT],
-                        &aShipPosition[WC1_EYE_OBJECT]);
+        AddFixedVectors(&aShipPosition[EYE_OBJECT],
+                        &aShipVelocity[EYE_OBJECT],
+                        &aShipPosition[EYE_OBJECT]);
         return 0;
     case 7:
         if (acShipTarget[0] != -1) {
             ScaleFixedVector(&aShipRightVector[0],
                              0x12c00, &vector);
             AddFixedVectors(&aShipPosition[0], &vector,
-                            &aShipPosition[WC1_EYE_OBJECT]);
+                            &aShipPosition[EYE_OBJECT]);
             ComputeVectorDelta(
-                &aShipPosition[WC1_EYE_OBJECT],
+                &aShipPosition[EYE_OBJECT],
                 &aShipPosition[
                     acShipTarget[0]],
                 &vector);
             NormalizeFixedVector(&vector);
-            aShipForwardVector[WC1_EYE_OBJECT] = vector;
+            aShipForwardVector[EYE_OBJECT] = vector;
             ScaleFixedVector(&vector, -0x25800, &vector);
-            AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT],
+            AddFixedVectors(&aShipPosition[EYE_OBJECT],
                             &vector,
-                            &aShipPosition[WC1_EYE_OBJECT]);
-            fix_objects_ijk(WC1_EYE_OBJECT);
+                            &aShipPosition[EYE_OBJECT]);
+            fix_objects_ijk(EYE_OBJECT);
             return 0;
         }
         if (bCockpitlessView != 0) {
@@ -543,38 +543,38 @@ unsigned int set_eye_direction_and_position(void)
         new_view(0, 0);
         return 0;
     case 8:
-        ScaleFixedVector(&aShipForwardVector[WC1_EYE_OBJECT],
+        ScaleFixedVector(&aShipForwardVector[EYE_OBJECT],
                          nCapitalShipViewDistance, &vector);
         SubtractFixedVectors(
             &aShipPosition[cViewObject], &vector,
-            &aShipPosition[WC1_EYE_OBJECT]);
+            &aShipPosition[EYE_OBJECT]);
         if (Vector_magnitude(
-                &aShipVelocity[WC1_EYE_OBJECT]) != 0) {
-            AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT],
-                            &aShipVelocity[WC1_EYE_OBJECT],
-                            &aShipPosition[WC1_EYE_OBJECT]);
+                &aShipVelocity[EYE_OBJECT]) != 0) {
+            AddFixedVectors(&aShipPosition[EYE_OBJECT],
+                            &aShipVelocity[EYE_OBJECT],
+                            &aShipPosition[EYE_OBJECT]);
             return 0;
         }
         break;
     case 9:
-        copy_frame(0, WC1_EYE_OBJECT);
-        negate_vector(&aShipRightVector[WC1_EYE_OBJECT]);
-        negate_vector(&aShipForwardVector[WC1_EYE_OBJECT]);
-        aShipVelocity[WC1_EYE_OBJECT] =
+        copy_frame(0, EYE_OBJECT);
+        negate_vector(&aShipRightVector[EYE_OBJECT]);
+        negate_vector(&aShipForwardVector[EYE_OBJECT]);
+        aShipVelocity[EYE_OBJECT] =
             aShipVelocity[0];
-        aShipPosition[WC1_EYE_OBJECT] =
+        aShipPosition[EYE_OBJECT] =
             aShipPosition[0];
         return 0;
     case 10:
-        copy_frame((short)cViewObject, WC1_EYE_OBJECT);
-        aShipVelocity[WC1_EYE_OBJECT] =
+        copy_frame((short)cViewObject, EYE_OBJECT);
+        aShipVelocity[EYE_OBJECT] =
             aShipVelocity[cViewObject];
-        aShipPosition[WC1_EYE_OBJECT] =
+        aShipPosition[EYE_OBJECT] =
             aShipPosition[cViewObject];
         return 0;
     case 11:
         ComputeVectorDelta(
-            &aShipPosition[WC1_EYE_OBJECT],
+            &aShipPosition[EYE_OBJECT],
             &aShipPosition[cViewObject], &vector);
         magnitude = Vector_magnitude(&vector);
         if (magnitude < 0x25800) {
@@ -582,40 +582,40 @@ unsigned int set_eye_direction_and_position(void)
             NormalizeFixedVector(&adjustment);
             ScaleFixedVector(&adjustment, -0x25800, &adjustment);
             AddFixedVectors(&vector, &adjustment, &adjustment);
-            AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT],
+            AddFixedVectors(&aShipPosition[EYE_OBJECT],
                             &adjustment,
-                            &aShipPosition[WC1_EYE_OBJECT]);
+                            &aShipPosition[EYE_OBJECT]);
         }
-        aShipForwardVector[WC1_EYE_OBJECT] = vector;
-        fix_objects_ijk(WC1_EYE_OBJECT);
-        AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT],
-                        &aShipVelocity[WC1_EYE_OBJECT],
-                        &aShipPosition[WC1_EYE_OBJECT]);
+        aShipForwardVector[EYE_OBJECT] = vector;
+        fix_objects_ijk(EYE_OBJECT);
+        AddFixedVectors(&aShipPosition[EYE_OBJECT],
+                        &aShipVelocity[EYE_OBJECT],
+                        &aShipPosition[EYE_OBJECT]);
         return 0;
     case 12:
-        ScaleFixedVector(&aShipRightVector[WC1_EYE_OBJECT],
+        ScaleFixedVector(&aShipRightVector[EYE_OBJECT],
                          -0xa00, &vector);
-        AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT], &vector,
-                        &aShipPosition[WC1_EYE_OBJECT]);
-        AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT],
-                        &aShipVelocity[WC1_EYE_OBJECT],
-                        &aShipPosition[WC1_EYE_OBJECT]);
+        AddFixedVectors(&aShipPosition[EYE_OBJECT], &vector,
+                        &aShipPosition[EYE_OBJECT]);
+        AddFixedVectors(&aShipPosition[EYE_OBJECT],
+                        &aShipVelocity[EYE_OBJECT],
+                        &aShipPosition[EYE_OBJECT]);
         look_at(0);
         return 0;
     case 13:
-        AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT],
-                        &aShipVelocity[WC1_EYE_OBJECT],
-                        &aShipPosition[WC1_EYE_OBJECT]);
+        AddFixedVectors(&aShipPosition[EYE_OBJECT],
+                        &aShipVelocity[EYE_OBJECT],
+                        &aShipPosition[EYE_OBJECT]);
         look_at(0);
         return 0;
     case 14:
         SetFleetOverviewView(0);
         return 0;
     case 15:
-        AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT],
-                        &aShipVelocity[WC1_EYE_OBJECT],
-                        &aShipPosition[WC1_EYE_OBJECT]);
-        rotate_object(WC1_EYE_OBJECT);
+        AddFixedVectors(&aShipPosition[EYE_OBJECT],
+                        &aShipVelocity[EYE_OBJECT],
+                        &aShipPosition[EYE_OBJECT]);
+        rotate_object(EYE_OBJECT);
         rotate_eye_to_goal();
         break;
     }
@@ -652,10 +652,10 @@ unsigned int new_view(int view, short obj)
         view = 8;
     nCameraViewMode = view;
     if (obj != -1)
-        asObjectCollisionRadius[WC1_EYE_OBJECT] =
+        asObjectCollisionRadius[EYE_OBJECT] =
             MaxShort(10, asObjectCollisionRadius[obj]);
     else
-        asObjectCollisionRadius[WC1_EYE_OBJECT] = 10;
+        asObjectCollisionRadius[EYE_OBJECT] = 10;
     switch (view) {
     case 0:
         initialize_cockpit(0);
@@ -675,7 +675,7 @@ unsigned int new_view(int view, short obj)
             ScaleFixedVector(
                              &aShipForwardVector[
                                  cViewObject],
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                              -1200 * 0x100, &vector);
 #else
                              -1200 << 8, &vector);
@@ -684,12 +684,12 @@ unsigned int new_view(int view, short obj)
                             &aShipPosition[
                                 cViewObject],
                             &vector,
-                            &aShipPosition[WC1_EYE_OBJECT]);
-            aShipUpVector[WC1_EYE_OBJECT] =
+                            &aShipPosition[EYE_OBJECT]);
+            aShipUpVector[EYE_OBJECT] =
                 aShipUpVector[cViewObject];
-            aShipForwardVector[WC1_EYE_OBJECT] = vector;
-            fix_objects_ijk(WC1_EYE_OBJECT);
-            zero_vector(&aShipVelocity[WC1_EYE_OBJECT]);
+            aShipForwardVector[EYE_OBJECT] = vector;
+            fix_objects_ijk(EYE_OBJECT);
+            zero_vector(&aShipVelocity[EYE_OBJECT]);
         }
         break;
     case 5:
@@ -698,40 +698,40 @@ unsigned int new_view(int view, short obj)
         if (NormalizeFixedVector(&vector) == 0)
             vector =
                 aShipForwardVector[cViewObject];
-        aShipUpVector[WC1_EYE_OBJECT] =
+        aShipUpVector[EYE_OBJECT] =
             aShipUpVector[cViewObject];
         if (vector.x ==
-                aShipUpVector[WC1_EYE_OBJECT].x &&
+                aShipUpVector[EYE_OBJECT].x &&
             vector.y ==
-                aShipUpVector[WC1_EYE_OBJECT].y &&
+                aShipUpVector[EYE_OBJECT].y &&
             vector.z ==
-                aShipUpVector[WC1_EYE_OBJECT].z) {
-            aShipUpVector[WC1_EYE_OBJECT] =
+                aShipUpVector[EYE_OBJECT].z) {
+            aShipUpVector[EYE_OBJECT] =
                 aShipRightVector[cViewObject];
         }
         ScaleFixedVector(&vector, -0x12430, &vector);
         AddFixedVectors(
             &aShipPosition[cViewObject],
-            &vector, &aShipPosition[WC1_EYE_OBJECT]);
-        aShipForwardVector[WC1_EYE_OBJECT] = vector;
-        fix_objects_ijk(WC1_EYE_OBJECT);
-        zero_vector(&aShipVelocity[WC1_EYE_OBJECT]);
-        ScaleFixedVector(&aShipRightVector[WC1_EYE_OBJECT],
+            &vector, &aShipPosition[EYE_OBJECT]);
+        aShipForwardVector[EYE_OBJECT] = vector;
+        fix_objects_ijk(EYE_OBJECT);
+        zero_vector(&aShipVelocity[EYE_OBJECT]);
+        ScaleFixedVector(&aShipRightVector[EYE_OBJECT],
                          0x19000, &vector);
-        AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT],
+        AddFixedVectors(&aShipPosition[EYE_OBJECT],
                         &vector,
-                        &aShipPosition[WC1_EYE_OBJECT]);
-        ScaleFixedVector(&aShipUpVector[WC1_EYE_OBJECT],
+                        &aShipPosition[EYE_OBJECT]);
+        ScaleFixedVector(&aShipUpVector[EYE_OBJECT],
                          0x6400, &vector);
-        AddFixedVectors(&aShipPosition[WC1_EYE_OBJECT],
+        AddFixedVectors(&aShipPosition[EYE_OBJECT],
                         &vector,
-                        &aShipPosition[WC1_EYE_OBJECT]);
+                        &aShipPosition[EYE_OBJECT]);
         ComputeVectorDelta(
-            &aShipPosition[WC1_EYE_OBJECT],
+            &aShipPosition[EYE_OBJECT],
             &aShipPosition[cViewObject],
             &vector);
-        aShipForwardVector[WC1_EYE_OBJECT] = vector;
-        fix_objects_ijk(WC1_EYE_OBJECT);
+        aShipForwardVector[EYE_OBJECT] = vector;
+        fix_objects_ijk(EYE_OBJECT);
         break;
     case 6:
         initialize_cockpit(4);
@@ -740,35 +740,35 @@ unsigned int new_view(int view, short obj)
             0x25800, &vector);
         AddFixedVectors(
             &aShipPosition[nExternalViewShip],
-            &vector, &aShipPosition[WC1_EYE_OBJECT]);
+            &vector, &aShipPosition[EYE_OBJECT]);
         ComputeVectorDelta(
-            &aShipPosition[WC1_EYE_OBJECT],
+            &aShipPosition[EYE_OBJECT],
             &aShipPosition[nExternalViewShip],
             &vector);
-        aShipUpVector[WC1_EYE_OBJECT] =
+        aShipUpVector[EYE_OBJECT] =
             aShipUpVector[0];
-        aShipForwardVector[WC1_EYE_OBJECT] = vector;
-        fix_objects_ijk(WC1_EYE_OBJECT);
-        zero_vector(&aShipVelocity[WC1_EYE_OBJECT]);
+        aShipForwardVector[EYE_OBJECT] = vector;
+        fix_objects_ijk(EYE_OBJECT);
+        zero_vector(&aShipVelocity[EYE_OBJECT]);
         nExternalViewDistance = 0x20;
         nExternalViewAngle = 0;
         break;
     case 7:
         initialize_cockpit(4);
-        copy_frame(0, WC1_EYE_OBJECT);
-        zero_vector(&aShipVelocity[WC1_EYE_OBJECT]);
+        copy_frame(0, EYE_OBJECT);
+        zero_vector(&aShipVelocity[EYE_OBJECT]);
         break;
     case 8:
         initialize_cockpit(4);
-        aShipRightVector[WC1_EYE_OBJECT] =
+        aShipRightVector[EYE_OBJECT] =
             aShipRightVector[cViewObject];
-        aShipUpVector[WC1_EYE_OBJECT] =
+        aShipUpVector[EYE_OBJECT] =
             aShipForwardVector[cViewObject];
-        negate_vector(&aShipUpVector[WC1_EYE_OBJECT]);
-        aShipForwardVector[WC1_EYE_OBJECT] =
+        negate_vector(&aShipUpVector[EYE_OBJECT]);
+        aShipForwardVector[EYE_OBJECT] =
             aShipUpVector[cViewObject];
-        fix_objects_ijk(WC1_EYE_OBJECT);
-        zero_vector(&aShipVelocity[WC1_EYE_OBJECT]);
+        fix_objects_ijk(EYE_OBJECT);
+        zero_vector(&aShipVelocity[EYE_OBJECT]);
         break;
     case 9:
         initialize_cockpit(6);
@@ -788,10 +788,10 @@ unsigned int new_view(int view, short obj)
         break;
     case 12:
         initialize_cockpit(4);
-        copy_frame(0, WC1_EYE_OBJECT);
-        position_relative_ijk(&aShipPosition[WC1_EYE_OBJECT],
+        copy_frame(0, EYE_OBJECT);
+        position_relative_ijk(&aShipPosition[EYE_OBJECT],
                               0, 500, 0, 2000);
-        zero_vector(&aShipVelocity[WC1_EYE_OBJECT]);
+        zero_vector(&aShipVelocity[EYE_OBJECT]);
         look_at(0);
         break;
     case 13:
@@ -800,17 +800,17 @@ unsigned int new_view(int view, short obj)
         if (nYourWingman != -1)
             zero_vector(
                 &aShipVelocity[nYourWingman]);
-        copy_frame(cViewObject, WC1_EYE_OBJECT);
+        copy_frame(cViewObject, EYE_OBJECT);
         carrier = find_ship_index(nCarrierMissionShipIndex);
         look_at(carrier);
         position_relative_ijk(
-            &aShipPosition[WC1_EYE_OBJECT],
-            WC1_EYE_OBJECT, 0, -10, -400);
-        aShipVelocity[WC1_EYE_OBJECT] =
-            aShipForwardVector[WC1_EYE_OBJECT];
-        ScaleFixedVector(&aShipVelocity[WC1_EYE_OBJECT],
+            &aShipPosition[EYE_OBJECT],
+            EYE_OBJECT, 0, -10, -400);
+        aShipVelocity[EYE_OBJECT] =
+            aShipForwardVector[EYE_OBJECT];
+        ScaleFixedVector(&aShipVelocity[EYE_OBJECT],
                          -0x2300,
-                         &aShipVelocity[WC1_EYE_OBJECT]);
+                         &aShipVelocity[EYE_OBJECT]);
         break;
     case 14:
         SetFleetOverviewView(1);
@@ -837,17 +837,17 @@ unsigned int start_dust(short obj, FixedVector origin,
     short streak;
 
     set_objects_data(obj, OBJECT_TYPE_SPACE_DUST, -1);
-    ScaleFixedVector(&aShipForwardVector[WC1_EYE_OBJECT],
+    ScaleFixedVector(&aShipForwardVector[EYE_OBJECT],
                      (int)forwardDistance << 8, &offset);
     AddFixedVectors(&origin, &offset, &origin);
-    ScaleFixedVector(&aShipRightVector[WC1_EYE_OBJECT],
+    ScaleFixedVector(&aShipRightVector[EYE_OBJECT],
                      rightOffset, &offset);
     AddFixedVectors(&origin, &offset, &origin);
-    ScaleFixedVector(&aShipUpVector[WC1_EYE_OBJECT],
+    ScaleFixedVector(&aShipUpVector[EYE_OBJECT],
                      upOffset, &offset);
     AddFixedVectors(&origin, &offset, &origin);
     AddFixedVectors(&origin,
-                    &aShipPosition[WC1_EYE_OBJECT],
+                    &aShipPosition[EYE_OBJECT],
                     &aShipPosition[obj]);
     FillFixedVectorWithRandomComponents(2, &aShipVelocity[obj]);
     streak = MaxShort((short)(1 - RandomInRange(0, 3)), 0);
@@ -870,7 +870,7 @@ unsigned int generate_stars(void)
     do {
         if (obj < 42) {
             distance = RandomInRange(0, 1400);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
             start_dust(obj, origin, distance,
                        signed_random(distance) * 0x100,
                        signed_random(distance) * 0x100);
@@ -883,7 +883,7 @@ unsigned int generate_stars(void)
             aeObjectClass[obj] = OBJECT_CLASS_STAR;
             nStarFieldIRotation = signed_random(45);
             nStarFieldJRotation = signed_random(45);
-            copy_frame(WC1_EYE_OBJECT, 63);
+            copy_frame(EYE_OBJECT, 63);
             rotate_about_j(nStarFieldJRotation,
                            &aShipRightVector[63],
                            &aShipForwardVector[63]);
@@ -921,9 +921,9 @@ unsigned int update_star_field(void)
 
     hazardActive = pActiveHazardField != 0;
     vPreviousStarFieldMotion = vStarFieldMotion;
-    ScaleFixedVector(&aShipForwardVector[WC1_EYE_OBJECT],
+    ScaleFixedVector(&aShipForwardVector[EYE_OBJECT],
                      200 << 8, &cameraMotion);
-    ScaleFixedVector(&aShipVelocity[WC1_EYE_OBJECT],
+    ScaleFixedVector(&aShipVelocity[EYE_OBJECT],
                      20 << 8, &vStarFieldMotion);
     AddFixedVectors(&cameraMotion, &vStarFieldMotion,
                     &vStarFieldMotion);
@@ -951,7 +951,7 @@ unsigned int update_star_field(void)
                 randomChoice == 0 &&
                 (anObjectYawRotation[0] |
                  anObjectPitchRotation[0]) != 0) {
-                copy_frame(WC1_EYE_OBJECT, 63);
+                copy_frame(EYE_OBJECT, 63);
                 if (anObjectPitchRotation[0] != 0) {
                     nStarFieldIRotation =
                         anObjectPitchRotation[0] < 0 ?
@@ -982,24 +982,24 @@ unsigned int update_star_field(void)
             if (aeObjectClass[objectIndex] == OBJECT_CLASS_DUST &&
                 randomChoice < 2) {
                 transform_to_objects_frame(
-                    &aShipVelocity[WC1_EYE_OBJECT],
-                    &viewMotion, WC1_EYE_OBJECT);
+                    &aShipVelocity[EYE_OBJECT],
+                    &viewMotion, EYE_OBJECT);
                 ScaleFixedVector(&viewMotion, 10 << 8, &viewMotion);
                 if (viewMotion.z >= 0) {
                     distance =
                         (unsigned short)RandomInRange(
                             0, (short)(viewMotion.z >> 8)) +
-                        asObjectCollisionRadius[WC1_EYE_OBJECT];
+                        asObjectCollisionRadius[EYE_OBJECT];
                     distance = distance * 2 +
                         (unsigned short)RandomInRange(0, 350);
                 } else {
                     distance = (unsigned short)RandomInRange(0, 40) +
-                        asObjectCollisionRadius[WC1_EYE_OBJECT];
+                        asObjectCollisionRadius[EYE_OBJECT];
                 }
                 rightRandom = signed_random((short)(distance >> 1));
                 upRandom = signed_random((short)(distance >> 1));
                 shift = (unsigned char)(viewMotion.z <= 0 ? 9 : 8);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 rightOffset =
                     viewMotion.x + (int)rightRandom * (1 << shift);
                 upOffset =
@@ -1032,7 +1032,7 @@ unsigned int house_keep_objects(void)
 {
     short obj;
 
-    for (obj = 0; obj <= WC1_SPACE_LAST_MOVING_OBJECT; obj++) {
+    for (obj = 0; obj <= SPACE_LAST_MOVING_OBJECT; obj++) {
         switch (aeObjectClass[obj]) {
         case OBJECT_CLASS_DUST:
             if (aeObjectType[obj] == OBJECT_TYPE_DEBRIS_DUST &&
@@ -1147,7 +1147,7 @@ unsigned int house_keep_objects(void)
                 bLandingAuthorized != 0 &&
                 normal_speed(0) != 0) {
                 get_facing_range_from_object(0, obj);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 /* WC2 lands from any bearing; the original also required the
                    Claw's bow to face the player. */
                 if (nTargetRange < 700 &&
@@ -1201,7 +1201,7 @@ unsigned int update_objects_in_space(void)
             }
         }
         obj++;
-    } while (obj <= WC1_SPACE_LAST_MOVING_OBJECT);
+    } while (obj <= SPACE_LAST_MOVING_OBJECT);
 
     obj = 0;
     do {
@@ -1213,7 +1213,7 @@ unsigned int update_objects_in_space(void)
             }
         }
         obj++;
-    } while (obj <= WC1_SPACE_LAST_MOVING_OBJECT);
+    } while (obj <= SPACE_LAST_MOVING_OBJECT);
     return 0;
 }
 
@@ -1636,9 +1636,9 @@ int object_collision(short obj)
             collisionSpeed =
                 (short)((unsigned int)Vector_magnitude(&componentDelta) >> 8);
             damage = (short)((collisionSpeed * collisionSpeed) >> 1);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
             if (obj == 0 || partner == 0)
-                Wc1SdlQueueJoystickCollisionRumble(collisionSpeed);
+                SdlQueueJoystickCollisionRumble(collisionSpeed);
 #endif
 
             objectMass = (unsigned short)

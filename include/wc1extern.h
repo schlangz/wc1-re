@@ -6,10 +6,10 @@
  *  (docs/LABELS.md).  Entries move to include/wc1funcs.h as they are
  *  implemented, and get a real name at that point.
  */
-#ifndef WC1_EXTERN_H
-#define WC1_EXTERN_H
+#ifndef GAME_EXTERN_H
+#define GAME_EXTERN_H
 
 void ShowEnemyTargetSelectMenu(void);                             /* 0x00430E90 */
 void _free_dbg(void *p, int blockType);                           /* Function start: 0x401250 */
 long _ftol(void);                                                 /* Pointer table of prompt strings indexed by SendCommMenuChoice. */
-#endif /* WC1_EXTERN_H */
+#endif /* GAME_EXTERN_H */

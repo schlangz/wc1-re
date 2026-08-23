@@ -230,7 +230,7 @@ unsigned int reposition_fixed_child_objects(void)
     short angle;
     short parent;
     short object;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     int fixedCosine;
     int fixedSine;
     float attachmentRight;
@@ -277,7 +277,7 @@ unsigned int reposition_fixed_child_objects(void)
                     asObjectScreenX[parentIndex];
                 asObjectScreenY[objectIndex] +=
                     asObjectScreenY[parentIndex];
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 if (aeObjectType[objectIndex] ==
                         OBJECT_TYPE_THRUSTERS) {
                     /* Match the anchor to the enhanced parent transform. */
@@ -299,7 +299,7 @@ unsigned int reposition_fixed_child_objects(void)
                     sineFloat = (float)fixedSine / 65536.0f;
                     attachmentRight = (float)right / 256.0f;
                     attachmentUp = (float)up / 256.0f;
-                    Wc1SdlSetThrusterScreenPosition(
+                    SdlSetThrusterScreenPosition(
                         object,
                         parentScreenX + attachmentRight * cosineFloat -
                             attachmentUp * sineFloat,
@@ -316,7 +316,7 @@ unsigned int reposition_fixed_child_objects(void)
                     asObjectScale[objectIndex] >> 8);
         }
         object++;
-    } while (object <= WC1_SPACE_LAST_MOVING_OBJECT);
+    } while (object <= SPACE_LAST_MOVING_OBJECT);
     return 0;
 }
 
@@ -1684,7 +1684,7 @@ short find_ships_sphere(short missionShip)
     navIndex = 0;
     navPoint = aMissionNavPoints;
     fallback = -1;
-    for (; navIndex < WC1_ACTIVE_MISSION_NAV_POINT_COUNT;
+    for (; navIndex < ACTIVE_MISSION_NAV_POINT_COUNT;
          navIndex++, navPoint++) {
         for (shipIndex = 0; shipIndex < 10; shipIndex++) {
             if (navPoint->missionShips[shipIndex] == missionShip) {

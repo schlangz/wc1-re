@@ -44,11 +44,11 @@ void SetCinematicFrameTiming(void)
 /* Function start: 0x432140 */
 void DIBerror(const char *tag, int hr)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     const char *text = SDL_GetError();
 
     sprintf(szDIBErrorMessage, "ERROR: %s - (%s)", tag, text);
-    Wc1SdlShutdownVideo();
+    SdlShutdownVideo();
     OutputDebugStringA(szDIBErrorMessage);
     if (hDIBWindow != 0)
         SDL_SetWindowSize((SDL_Window *)hDIBWindow, 320, 200);
@@ -79,8 +79,8 @@ void DIBerror(const char *tag, int hr)
 /* Function start: 0x432230 */
 void DIBpositionWindow(void)
 {
-#ifdef WC1_SDL
-    Wc1SdlShutdownVideo();
+#ifdef SDL_PORT
+    SdlShutdownVideo();
     if (hDIBWindow != 0)
         SDL_SetWindowSize((SDL_Window *)hDIBWindow, 320, 200);
 #else
@@ -96,7 +96,7 @@ void DIBpositionWindow(void)
 /* Function start: 0x4322B0 */
 void DIBreInstall(void)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     int err;
 
     if (bDirectDrawModeCascadeEnabled != 0) {
@@ -108,7 +108,7 @@ void DIBreInstall(void)
         nDIBCascadeLevel = -1;
     }
 #else
-    if (!Wc1SdlInitializeVideo((SDL_Window *)hDIBWindow))
+    if (!SdlInitializeVideo((SDL_Window *)hDIBWindow))
         DIBerror("DIBreInstall", -1);
 #endif
     DIBslam();
@@ -118,15 +118,15 @@ void DIBreInstall(void)
 /* Function start: 0x432310 */
 void DIBinstall(HWND window)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     LPDIRECTDRAW directDraw;
     HRESULT result;
     int cascadeResult;
 #endif
 
     hDIBWindow = window;
-#ifdef WC1_SDL
-    if (!Wc1SdlInitializeVideo((SDL_Window *)window))
+#ifdef SDL_PORT
+    if (!SdlInitializeVideo((SDL_Window *)window))
         DIBerror("DIBinstall", -1);
     nDIBCascadeLevel = 0;
 #else
@@ -171,7 +171,7 @@ void DIBinstall(HWND window)
 /* Function start: 0x432410 */
 int DIBcascade(int mode, int *reportedResult)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     nDIBCascadeLevel = 0;
     if (reportedResult != 0)
         *reportedResult = 0;
@@ -306,8 +306,8 @@ int DIBcascade(int mode, int *reportedResult)
 void DIBunInstall(void)
 {
     DIBdestroyDIB();
-#ifdef WC1_SDL
-    Wc1SdlShutdownVideo();
+#ifdef SDL_PORT
+    SdlShutdownVideo();
     hDIBWindow = 0;
 #else
     COM_RELEASE(pSecondarySurface);
@@ -320,7 +320,7 @@ void DIBunInstall(void)
 /* Function start: 0x4326E0 */
 void DIBmakeDIB(void)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     DDSURFACEDESC surface;
     PALETTEENTRY entries[256];
     HRESULT result;
@@ -338,7 +338,7 @@ void DIBmakeDIB(void)
 #endif
 
     DAT_00486058 = 8;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     offset = 0;
     do {
         entries[offset / 4].peRed = abDIBPaletteCache[offset + 2];
@@ -380,7 +380,7 @@ void DIBmakeDIB(void)
     nDIBWidth = 320;
     nDIBHeight = 200;
     pDIBPixelBuffer = malloc(64000);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     if (pDIBPixelBuffer == 0)
         DIBerror("DIBmakeDIB", -1);
 #endif
@@ -393,19 +393,19 @@ void DIBmakeDIB(void)
 /* Function start: 0x4328A0 */
 void DIBdestroyDIB(void)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     int result;
 #endif
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     if (pDIBPixelBuffer != 0) {
 #endif
     memcpy(abDIBPixelBackup, pDIBPixelBuffer,
            nDIBWidth * nDIBHeight);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     }
 #endif
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     if (nDIBCascadeLevel > 0) {
         result = IDirectDrawSurface_Release(pSecondarySurface);
         if (result != 0)
@@ -424,7 +424,7 @@ void DIBdestroyDIB(void)
     DAT_00476640 = 0;
     DAT_00476644 = 0;
     pDIBPixelBuffer = 0;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     stScreen.pixels = 0;
     stScreen.allocation = 0;
 #endif
@@ -439,7 +439,7 @@ void DIBslam(void)
 /* Function start: 0x432970 */
 void DIBslamReal(void)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     DDSURFACEDESC surface;
     unsigned char *destination;
     unsigned char *source;
@@ -452,12 +452,12 @@ void DIBslamReal(void)
 
     UpdateStreamerStoppedFlag();
     if (bDIBSlamPending != 0) {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         memset(&surface, 0, sizeof(surface));
         surface.dwSize = sizeof(surface);
 #endif
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         if (stMouseCursorState.viewport != 0 &&
             stMouseCursorState.viewport->pixels ==
                 pDIBPixelBuffer) {
@@ -469,7 +469,7 @@ void DIBslamReal(void)
             DrawMouseCursor();
         }
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         if (nDIBCascadeLevel > 0) {
             result = IDirectDrawSurface_Lock(
                 pSecondarySurface,
@@ -537,12 +537,12 @@ void DIBslamReal(void)
                 pPrimarySurface, surface.lpSurface);
         }
 #else
-        if (!Wc1SdlPresentIndexedFrame(pDIBPixelBuffer,
+        if (!SdlPresentIndexedFrame(pDIBPixelBuffer,
                                        abDIBPaletteCache))
             DIBerror("DIBslamReal", -1);
 #endif
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         if (stMouseCursorState.viewport != 0 &&
             stMouseCursorState.viewport->pixels ==
                 pDIBPixelBuffer)
@@ -552,7 +552,7 @@ void DIBslamReal(void)
 #endif
             RestoreMouseCursorBackground();
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         if (nDIBCascadeLevel > 0) {
             destinationRect.left = 0;
             destinationRect.top = 0;
@@ -601,7 +601,7 @@ void DIBslamReal(void)
 
     nDIBSlamCount++;
     ServiceSoundSystem();
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     ThrottleFrameAndDrawFps(0);
 #else
     dc = GetDC(hDIBWindow);
@@ -613,7 +613,7 @@ void DIBslamReal(void)
 /* Function start: 0x432C60 */
 void DIBupdate(int left, int top, int right, int bottom)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     unsigned char *destination;
     unsigned char *source;
     DDSURFACEDESC surface;
@@ -641,10 +641,10 @@ void DIBupdate(int left, int top, int right, int bottom)
     if (bottom > 199)
         bottom = 199;
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     if (right < left || bottom < top)
         return;
-    if (!Wc1SdlPresentIndexedFrame(pDIBPixelBuffer,
+    if (!SdlPresentIndexedFrame(pDIBPixelBuffer,
                                    abDIBPaletteCache))
         DIBerror("DIBupdate", -1);
 #else
@@ -711,9 +711,9 @@ void CachePaletteEntryFromWords(short index, unsigned short *rgb)
 /* Function start: 0x432EA0 */
 void DIBramPalette(void)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     if (pDIBPixelBuffer != 0 &&
-        !Wc1SdlPresentIndexedFrame(pDIBPixelBuffer,
+        !SdlPresentIndexedFrame(pDIBPixelBuffer,
                                    abDIBPaletteCache))
         DIBerror("DIBramPalette", -1);
 #else
@@ -744,7 +744,7 @@ void DIBsetPalette(short index, short *rgb)
     int wordOffset;
     int cacheOffset;
     int paletteIndex;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     PALETTEENTRY entry;
     HRESULT result;
 #endif
@@ -766,10 +766,10 @@ void DIBsetPalette(short index, short *rgb)
         abDIBPaletteCache[cacheOffset + 3] = 1;
         awPaletteRgbWords[wordOffset + 2] = (unsigned char)value;
 
-        /* WC1_SDL consumes this cache on the next normal frame submission.
+        /* SDL_PORT consumes this cache on the next normal frame submission.
            A DirectDraw palette entry update did not blit or wait for vertical
            blank, so flight fades must not submit additional SDL frames. */
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         entry.peBlue = (unsigned char)value;
         entry.peRed = (unsigned char)awPaletteRgbWords[wordOffset];
         entry.peGreen =
@@ -803,34 +803,34 @@ void GetPaletteEntryAsWords(short i, unsigned short *rgb)
 /* Function start: 0x433060 */
 void DIBwholePaletteFromTriplets(unsigned char *palette)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     unsigned char entries[0x400];
 #endif
     int offset = 0;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     int error;
 
     IDirectDraw2_WaitForVerticalBlank(
         pDirectDraw2, DDWAITVB_BLOCKBEGIN, 0);
 #else
-    Wc1SdlWaitForVerticalBlank();
+    SdlWaitForVerticalBlank();
 #endif
     do {
         unsigned char value = palette[0];
 
         palette = palette + 3;
         abDIBPaletteCache[offset + 2] = value;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         entries[offset] = value;
 #endif
         value = palette[-2];
         abDIBPaletteCache[offset + 1] = value;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         entries[offset + 1] = value;
 #endif
         value = palette[-1];
         abDIBPaletteCache[offset] = value;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         entries[offset + 2] = value;
         entries[offset + 3] = 0;
 #endif
@@ -838,7 +838,7 @@ void DIBwholePaletteFromTriplets(unsigned char *palette)
         offset = offset + 4;
     } while (offset < 0x400);
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     DIBramPalette();
 #else
     error = IDirectDrawPalette_SetEntries(
@@ -857,34 +857,34 @@ void DIBwholePaletteFromTriplets(unsigned char *palette)
 /* Function start: 0x433120 */
 void DIBwholePaletteFromWords(unsigned short *palette)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     unsigned char entries[0x400];
 #endif
     int offset = 0;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     int error;
 
     IDirectDraw2_WaitForVerticalBlank(
         pDirectDraw2, DDWAITVB_BLOCKBEGIN, 0);
 #else
-    Wc1SdlWaitForVerticalBlank();
+    SdlWaitForVerticalBlank();
 #endif
     do {
         unsigned char value = *(unsigned char *)palette;
 
         palette = palette + 3;
         abDIBPaletteCache[offset + 2] = value;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         entries[offset] = value;
 #endif
         value = *(unsigned char *)(palette - 2);
         abDIBPaletteCache[offset + 1] = value;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         entries[offset + 1] = value;
 #endif
         value = *(unsigned char *)(palette - 1);
         abDIBPaletteCache[offset] = value;
-#ifndef WC1_SDL
+#ifndef SDL_PORT
         entries[offset + 2] = value;
         entries[offset + 3] = 0;
 #endif
@@ -892,7 +892,7 @@ void DIBwholePaletteFromWords(unsigned short *palette)
         offset = offset + 4;
     } while (offset < 0x400);
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     DIBramPalette();
 #else
     error = IDirectDrawPalette_SetEntries(
@@ -911,15 +911,15 @@ void DIBwholePaletteFromWords(unsigned short *palette)
 /* Function start: 0x4331E0 */
 void DIBwaitForVerticalBlank(void)
 {
-#ifdef WC1_SDL
-    Wc1SdlWaitForVerticalBlank();
+#ifdef SDL_PORT
+    SdlWaitForVerticalBlank();
 #else
     IDirectDraw2_WaitForVerticalBlank(
         pDirectDraw2, DDWAITVB_BLOCKBEGIN, 0);
 #endif
 }
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 
 /* Function start: 0x4331F0 */
 char *DirectDrawResultToText(int result)

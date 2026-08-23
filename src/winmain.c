@@ -465,7 +465,7 @@ void check_hazards(void)
 /* Function start: 0x401CE0 */
 void __stdcall WarpMouseTo(short x, short y)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     __asm cli
 #endif
     stHostMouseState.x = x;
@@ -473,7 +473,7 @@ void __stdcall WarpMouseTo(short x, short y)
     stMouseCursorState.x = x;
     stMouseCursorState.y = y;
     SetMouseHomePosition(x, y);
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     __asm sti
 #endif
 }
@@ -483,7 +483,7 @@ void CheckLauncherAndConfig(void)
 {
     FILE *config;
     char option[100];
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     char resolvedPath[PATH_MAX];
 #endif
 
@@ -493,8 +493,8 @@ void CheckLauncherAndConfig(void)
         *(unsigned char *)&bPlayerCollisionResponse = 0;
     }
 
-#ifdef WC1_SDL
-    if (Wc1SdlResolvePath("WINGCMDR.CFG", resolvedPath,
+#ifdef SDL_PORT
+    if (SdlResolvePath("WINGCMDR.CFG", resolvedPath,
                           sizeof(resolvedPath)))
         config = fopen(resolvedPath, "rt");
     else
@@ -533,7 +533,7 @@ void CheckLauncherAndConfig(void)
     }
 }
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 
 /* Function start: 0x401E30 */
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE previous,
@@ -620,7 +620,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE previous,
 void ShutdownGameWindow(void)
 {
     nSessionEndTime = (unsigned int)time(0);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     {
         SDL_Window *window;
 
@@ -631,7 +631,7 @@ void ShutdownGameWindow(void)
         DestroyGlobalDebugOverlayConsole();
         window = (SDL_Window *)hMainWindow;
         DIBunInstall();
-        Wc1SdlShutdownJoysticks();
+        SdlShutdownJoysticks();
         if (window != 0)
             SDL_DestroyWindow(window);
         hMainWindow = 0;
@@ -667,7 +667,7 @@ void ShowNoticeMessageBox(const char *text)
 /* Function start: 0x402110 */
 unsigned int AbortToDesktop(void)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     HANDLE process;
 
     ClipCursor(0);
@@ -682,13 +682,13 @@ unsigned int AbortToDesktop(void)
             nGuardedAllocationTotalBytes);
     OutputDebugStringA("Memory Info:\n");
     OutputDebugStringA(szMemoryUsage);
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     CloseHandle(hSingleInstanceSemaphore);
 #endif
     return 0;
 }
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 
 /* Function start: 0x402180 */
 int CreateMainWindow(HINSTANCE instance, HINSTANCE previous,
@@ -749,7 +749,7 @@ int CreateMainWindow(HINSTANCE instance, HINSTANCE previous,
 /* Function start: 0x402320 */
 unsigned int PumpWindowMessages(void)
 {
-#ifndef WC1_SDL
+#ifndef SDL_PORT
     RECT clip;
     MSG message;
     int cursorX;
@@ -762,8 +762,8 @@ unsigned int PumpWindowMessages(void)
     bWindowMessagePumpActive = 1;
     if (pEventManagerPump != 0)
         pEventManagerPump();
-#ifdef WC1_SDL
-    Wc1SdlPumpEvents();
+#ifdef SDL_PORT
+    SdlPumpEvents();
 #else
     done = 0;
     do {
@@ -836,7 +836,7 @@ unsigned int GetF1KeyLatch(void)
     return bF1KeyLatch;
 }
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 
 /* Function start: 0x402530 */
 LRESULT CALLBACK MainWindowProc(HWND window, UINT message,
@@ -993,8 +993,8 @@ int __stdcall GetJoystickPosition(unsigned int *x, unsigned int *y,
         device = 0;
         infoIndex = 0;
     }
-#ifdef WC1_SDL
-    if (Wc1SdlReadJoystick(
+#ifdef SDL_PORT
+    if (SdlReadJoystick(
             device, &aJoystickInfo[infoIndex]) != FALSE) {
 #else
     if (joyGetPos(device, &aJoystickInfo[infoIndex]) ==
@@ -1011,7 +1011,7 @@ int __stdcall GetJoystickPosition(unsigned int *x, unsigned int *y,
         return 0;
     }
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     if ((fallback & 0xffff) == 0xffff)
         fallback = (unsigned int)-1;
     else
@@ -1036,7 +1036,7 @@ short GetJoystickButtons(void)
 void GetJoystickDevCaps(short joystick, short *xMin, short *xMax,
                         short *yMin, short *yMax)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     unsigned int hostXMin;
     unsigned int hostXMax;
     unsigned int hostYMin;
@@ -1047,8 +1047,8 @@ void GetJoystickDevCaps(short joystick, short *xMin, short *xMax,
     unsigned int device = joystick != 0;
 
     *xMin = *xMax = *yMin = *yMax = 0;
-#ifdef WC1_SDL
-    if (Wc1SdlReadJoystickAxisRange(
+#ifdef SDL_PORT
+    if (SdlReadJoystickAxisRange(
             device, &hostXMin, &hostXMax, &hostYMin, &hostYMax) == FALSE) {
 #else
     if (joyGetDevCapsA(device, &caps, sizeof(caps)) != JOYERR_NOERROR) {
@@ -1057,7 +1057,7 @@ void GetJoystickDevCaps(short joystick, short *xMin, short *xMax,
         return;
     }
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     *xMin = (short)hostXMin;
     *xMax = (short)hostXMax;
     *yMin = (short)hostYMin;
@@ -1148,7 +1148,7 @@ void ReportHeapGuardCorruption(void *memory, int count, int overrun)
 void CheckAllGuardedAllocations(void)
 {
     GuardedAllocation *allocation = pGuardedAllocationHead;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     unsigned char *guard;
     unsigned int guardValue;
 #else
@@ -1159,7 +1159,7 @@ void CheckAllGuardedAllocations(void)
     int suffixCorrupt;
 
     while (allocation != 0) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         guard = (unsigned char *)allocation->block;
 #else
         guard = (unsigned int *)allocation->block;
@@ -1167,7 +1167,7 @@ void CheckAllGuardedAllocations(void)
         prefixCorrupt = 0;
         i = 0x100;
         do {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
             memcpy(&guardValue, guard, sizeof(guardValue));
             if (guardValue != 0xabababab)
                 prefixCorrupt = prefixCorrupt + 1;
@@ -1182,7 +1182,7 @@ void CheckAllGuardedAllocations(void)
         if (prefixCorrupt != 0)
             ReportHeapGuardCorruption(allocation->block, prefixCorrupt, 0);
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         guard += allocation->size;
 #else
         guard = (unsigned int *)((unsigned char *)guard + allocation->size);
@@ -1190,7 +1190,7 @@ void CheckAllGuardedAllocations(void)
         suffixCorrupt = 0;
         i = 0x100;
         do {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
             memcpy(&guardValue, guard, sizeof(guardValue));
             if (guardValue != 0xabababab)
                 suffixCorrupt = suffixCorrupt + 1;
@@ -1214,7 +1214,7 @@ void FreeGuardedAllocation(void *memory)
 {
     GuardedAllocation *allocation = pGuardedAllocationHead;
     GuardedAllocation *previous = 0;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     unsigned char *guard;
     unsigned int guardValue;
 #else
@@ -1224,7 +1224,7 @@ void FreeGuardedAllocation(void *memory)
     int corrupt;
     int i;
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     guard = (unsigned char *)block;
 #else
     guard = (unsigned int *)block;
@@ -1241,7 +1241,7 @@ void FreeGuardedAllocation(void *memory)
     corrupt = 0;
     i = 0x100;
     do {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         memcpy(&guardValue, guard, sizeof(guardValue));
         if (guardValue != 0xabababab)
             corrupt = corrupt + 1;
@@ -1257,14 +1257,14 @@ void FreeGuardedAllocation(void *memory)
         ReportHeapGuardCorruption(memory, corrupt, 0);
 
     corrupt = 0;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     guard = (unsigned char *)memory + allocation->size;
 #else
     guard = (unsigned int *)((unsigned char *)memory + allocation->size);
 #endif
     i = 0x100;
     do {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         memcpy(&guardValue, guard, sizeof(guardValue));
         if (guardValue != 0xabababab)
             corrupt = corrupt + 1;

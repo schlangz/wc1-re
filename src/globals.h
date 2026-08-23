@@ -6,8 +6,8 @@
  *  declaration order belong to their evidence-backed compilation units;
  *  src/globals.c contains only the ownership still to be recovered.
  */
-#ifndef WC1_GLOBALS_H
-#define WC1_GLOBALS_H
+#ifndef GAME_GLOBALS_H
+#define GAME_GLOBALS_H
 
 #include "wc1.h"
 
@@ -36,4 +36,4 @@ extern unsigned char bMessageSpeed;   /* cycled (x+1)%5 */ /* 0x0046af68 */
 extern short nOriginDevUnlock;        /* argv element == "Origin" */ /* 0x00469ff4 */
 extern unsigned long dwGameClockBase; /* GetTickCount epoch, randomised at startup */ /* 0x005a89a8 */
 
-#endif /* WC1_GLOBALS_H */
+#endif /* GAME_GLOBALS_H */

@@ -873,7 +873,7 @@ void perform_maneuver(short obj)
     short range;
     int maneuverWeight;
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     /* The original performs this lookup before validating the maneuver.
        MANEUVER_NONE reads the zero alignment byte at 0x00465677, immediately
        before the table.  Other invalid values are reset before the result is
@@ -885,7 +885,7 @@ void perform_maneuver(short obj)
 #endif
         bCurrentManeuverReroll =
             abManeuverRerollChance[previous];
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     /* The original reaches the same completion path only after calculating
        geometry for target -1.  Those reads alias the globals immediately
        before three object tables in the Win32 image. */
@@ -908,7 +908,7 @@ void perform_maneuver(short obj)
         if (aeShipManeuver[obj] == MANEUVER_VEER_AWAY) {
             Mveer_away(obj, target);
         } else if (aeShipManeuver[obj] == MANEUVER_GLOAT) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
             Mgloat(obj);
 #else
             ((void (__cdecl *)(short, short))Mgloat)(obj, target);
@@ -921,7 +921,7 @@ void perform_maneuver(short obj)
         }
     } else if (aeShipManeuver[obj] >= 0 &&
                aeShipManeuver[obj] < 47) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         /* The original x86 dispatcher pushes both values for every handler.
            Several handlers consume only the ship, and two consume an unsigned
            target.  Call those through their real C types in the native port. */
@@ -2942,7 +2942,7 @@ void strike_mission(short obj)
 {
     short goal = find_ship_index(anShipMissionShip[obj]);
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     /* The original source indexes class[-1] here.  In the Win32 layout that
        aliases the last two previous-distance words; the intended no-goal
        branch is check_goal. */
@@ -3428,7 +3428,7 @@ unsigned int check_futurion(short i)
 /* Function start: 0x40B730 */
 unsigned int init_mission(short series, short mission)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     if (LoadMissionData(series, mission) != 0)
         return 1;
 #else
@@ -3496,17 +3496,17 @@ void prepare_mission(void)
     Build_objective_list();
     missionShip = 0;
     nCarrierMissionShipIndex = missionShip;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     /* The original scans to 64 even though the initialized table ends after
      * record 47.  Valid missions place the carrier in the loaded first 32;
      * stop at the proven storage boundary in the sanitizer-enabled port. */
-    while (missionShip < WC1_MISSION_SHIP_STORAGE_COUNT &&
+    while (missionShip < MISSION_SHIP_STORAGE_COUNT &&
            aMissionShips[missionShip].type !=
                OBJECT_TYPE_TIGERS_CLAW) {
 #else
     while (aMissionShips[missionShip].type !=
                OBJECT_TYPE_TIGERS_CLAW &&
-           missionShip < WC1_MISSION_SHIP_SCAN_LIMIT) {
+           missionShip < MISSION_SHIP_SCAN_LIMIT) {
 #endif
         missionShip++;
         nCarrierMissionShipIndex = missionShip;
@@ -3603,7 +3603,7 @@ int load_ship(enum ObjectType type, short slot)
                                 aeObjectType[obj]].shapeSet;
                     }
                     obj++;
-                } while (obj <= WC1_SPACE_LAST_MOVING_OBJECT);
+                } while (obj <= SPACE_LAST_MOVING_OBJECT);
                 return 0;
             }
             if (type != OBJECT_TYPE_MINE_FIELD) {
@@ -3730,7 +3730,7 @@ int free_ship(short slot)
                      OBJECT_CLASS_ASTEROID)
                 apObjectShape[obj] = 0;
             obj++;
-        } while (obj <= WC1_SPACE_LAST_MOVING_OBJECT);
+        } while (obj <= SPACE_LAST_MOVING_OBJECT);
         return 0;
     }
 
@@ -4019,7 +4019,7 @@ unsigned int init_personalities(void)
             prepare_ace((short)(personality - 9));
         }
         missionShip++;
-    } while (missionShip < WC1_ACTIVE_MISSION_SHIP_COUNT);
+    } while (missionShip < ACTIVE_MISSION_SHIP_COUNT);
 
     face = get_face(-1, SIDE_KILRATHI);
     get_pilot_talk(face);
@@ -4365,7 +4365,7 @@ void DrawNavTextLine(unsigned char alignment, unsigned short colour,
     pCurrentTextContext->alignment = alignment;
     pCurrentTextContext->textCursor =
         pCurrentTextContext->text;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     {
         va_list arguments;
 

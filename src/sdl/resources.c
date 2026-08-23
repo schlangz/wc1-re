@@ -12,20 +12,20 @@
 #define ORIGIN_PACKET_OFFSET_MASK 0x00ffffffU
 #define ORIGIN_PACKET_MAX_SECTION_SIZE (16U * 1024U * 1024U)
 
-typedef struct Wc1SdlOriginLzwEntry {
+typedef struct SdlOriginLzwEntry {
     uint16_t prefix;
     unsigned char value;
-} Wc1SdlOriginLzwEntry;
+} SdlOriginLzwEntry;
 
-typedef struct Wc1SdlOriginLzwBitReader {
+typedef struct SdlOriginLzwBitReader {
     const unsigned char *bytes;
     size_t byteCount;
     size_t bitPosition;
-} Wc1SdlOriginLzwBitReader;
+} SdlOriginLzwBitReader;
 
-static int g_nWc1SdlDosData = -1;
+static int g_nSdlDosData = -1;
 
-static uint32_t Wc1SdlReadLittleEndian32(const unsigned char *bytes)
+static uint32_t SdlReadLittleEndian32(const unsigned char *bytes)
 {
     return (uint32_t)bytes[0] |
         ((uint32_t)bytes[1] << 8) |
@@ -33,7 +33,7 @@ static uint32_t Wc1SdlReadLittleEndian32(const unsigned char *bytes)
         ((uint32_t)bytes[3] << 24);
 }
 
-static int Wc1SdlReadOriginLzwCode(Wc1SdlOriginLzwBitReader *reader,
+static int SdlReadOriginLzwCode(SdlOriginLzwBitReader *reader,
                                    unsigned int width,
                                    uint16_t *code)
 {
@@ -67,8 +67,8 @@ static int Wc1SdlReadOriginLzwCode(Wc1SdlOriginLzwBitReader *reader,
     return 1;
 }
 
-static int Wc1SdlWriteOriginLzwCode(
-    const Wc1SdlOriginLzwEntry *dictionary, uint16_t code,
+static int SdlWriteOriginLzwCode(
+    const SdlOriginLzwEntry *dictionary, uint16_t code,
     unsigned char *destination, size_t destinationSize,
     size_t *destinationPosition, unsigned char *firstValue)
 {
@@ -95,14 +95,14 @@ static int Wc1SdlWriteOriginLzwCode(
     return 1;
 }
 
-int Wc1SdlDecompressOriginLzw(const unsigned char *source,
+int SdlDecompressOriginLzw(const unsigned char *source,
                               size_t sourceSize,
                               unsigned char *destination,
                               size_t destinationSize,
                               size_t *writtenSize)
 {
-    Wc1SdlOriginLzwEntry dictionary[ORIGIN_LZW_MAX_CODE_COUNT];
-    Wc1SdlOriginLzwBitReader reader;
+    SdlOriginLzwEntry dictionary[ORIGIN_LZW_MAX_CODE_COUNT];
+    SdlOriginLzwBitReader reader;
     size_t destinationPosition;
     unsigned int codeWidth;
     unsigned int codeWidthThreshold;
@@ -122,7 +122,7 @@ int Wc1SdlDecompressOriginLzw(const unsigned char *source,
     *writtenSize = 0;
 
     codeWidth = 9;
-    if (!Wc1SdlReadOriginLzwCode(&reader, codeWidth, &code))
+    if (!SdlReadOriginLzwCode(&reader, codeWidth, &code))
         return 0;
     if (code == ORIGIN_LZW_STOP_CODE)
         return destinationSize == 0;
@@ -136,7 +136,7 @@ int Wc1SdlDecompressOriginLzw(const unsigned char *source,
         previousCode = ORIGIN_LZW_CLEAR_CODE;
 
         for (;;) {
-            if (!Wc1SdlReadOriginLzwCode(&reader, codeWidth, &code))
+            if (!SdlReadOriginLzwCode(&reader, codeWidth, &code))
                 return 0;
             if (code == ORIGIN_LZW_STOP_CODE) {
                 *writtenSize = destinationPosition;
@@ -150,7 +150,7 @@ int Wc1SdlDecompressOriginLzw(const unsigned char *source,
             specialCode = code == dictionarySize;
             decodedCode = specialCode ? previousCode : code;
             if (decodedCode == ORIGIN_LZW_CLEAR_CODE ||
-                !Wc1SdlWriteOriginLzwCode(
+                !SdlWriteOriginLzwCode(
                     dictionary, decodedCode, destination,
                     destinationSize, &destinationPosition,
                     &firstValue))
@@ -178,7 +178,7 @@ int Wc1SdlDecompressOriginLzw(const unsigned char *source,
     }
 }
 
-int Wc1SdlExtractOriginPacketSection(const unsigned char *archive,
+int SdlExtractOriginPacketSection(const unsigned char *archive,
                                      size_t archiveSize,
                                      unsigned int sectionIndex,
                                      unsigned char **section,
@@ -203,8 +203,8 @@ int Wc1SdlExtractOriginPacketSection(const unsigned char *archive,
     if (archive == 0 || archiveSize < 8)
         return 0;
 
-    declaredFileSize = Wc1SdlReadLittleEndian32(archive);
-    entry = Wc1SdlReadLittleEndian32(archive + 4);
+    declaredFileSize = SdlReadLittleEndian32(archive);
+    entry = SdlReadLittleEndian32(archive + 4);
     directorySize = entry & ORIGIN_PACKET_OFFSET_MASK;
     if (declaredFileSize > archiveSize || directorySize < 8 ||
         directorySize > declaredFileSize || (directorySize & 3U) != 0)
@@ -213,14 +213,14 @@ int Wc1SdlExtractOriginPacketSection(const unsigned char *archive,
     if (sectionIndex >= sectionCount)
         return 0;
 
-    entry = Wc1SdlReadLittleEndian32(
+    entry = SdlReadLittleEndian32(
         archive + ((size_t)sectionIndex + 1U) * 4U);
     compression = entry >> 24;
     sectionOffset = entry & ORIGIN_PACKET_OFFSET_MASK;
     if (sectionIndex + 1 == sectionCount) {
         sectionEnd = declaredFileSize;
     } else {
-        nextEntry = Wc1SdlReadLittleEndian32(
+        nextEntry = SdlReadLittleEndian32(
             archive + ((size_t)sectionIndex + 2U) * 4U);
         sectionEnd = nextEntry & ORIGIN_PACKET_OFFSET_MASK;
     }
@@ -245,13 +245,13 @@ int Wc1SdlExtractOriginPacketSection(const unsigned char *archive,
     if (sectionEnd - sectionOffset < 4)
         return 0;
 
-    outputSize = Wc1SdlReadLittleEndian32(archive + sectionOffset);
+    outputSize = SdlReadLittleEndian32(archive + sectionOffset);
     if (outputSize == 0 || outputSize > ORIGIN_PACKET_MAX_SECTION_SIZE)
         return 0;
     output = (unsigned char *)malloc(outputSize);
     if (output == 0)
         return 0;
-    if (!Wc1SdlDecompressOriginLzw(
+    if (!SdlDecompressOriginLzw(
             archive + sectionOffset + 4,
             sectionEnd - sectionOffset - 4,
             output, outputSize, &writtenSize)) {
@@ -263,28 +263,28 @@ int Wc1SdlExtractOriginPacketSection(const unsigned char *archive,
     return 1;
 }
 
-int Wc1SdlUsingDosData(void)
+int SdlUsingDosData(void)
 {
     unsigned char header[8];
     int file;
     int bytesRead;
 
-    if (g_nWc1SdlDosData >= 0)
-        return g_nWc1SdlDosData;
+    if (g_nSdlDosData >= 0)
+        return g_nSdlDosData;
     file = _open("GAMEDAT/MODULE.000", 0x8000);
     if (file == -1)
         file = _open("MODULE.000", 0x8000);
     if (file == -1)
         return 0;
-    g_nWc1SdlDosData = 0;
+    g_nSdlDosData = 0;
     bytesRead = (int)_read(file, header, sizeof(header));
     _close(file);
     if (bytesRead == (int)sizeof(header) && header[7] == 1)
-        g_nWc1SdlDosData = 1;
-    return g_nWc1SdlDosData;
+        g_nSdlDosData = 1;
+    return g_nSdlDosData;
 }
 
-void Wc1SdlCompleteDosInstallTable(DiskFileRecord *records)
+void SdlCompleteDosInstallTable(DiskFileRecord *records)
 {
     const DiskFileRecord expansionRecords[4] = {
         { "MODULE.002", 1, 7, 73 },

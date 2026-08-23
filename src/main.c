@@ -7,8 +7,8 @@
 #include "wc1.h"
 
 /* Function start: 0x4274E0 */
-#ifdef WC1_SDL
-int Wc1GameMain(short argc, char **argv)
+#ifdef SDL_PORT
+int GameMain(short argc, char **argv)
 #else
 int main(short argc, char **argv)
 #endif
@@ -38,8 +38,8 @@ int main(short argc, char **argv)
     _chdir("gamedat");
     LoadInstallDat();
     _chdir("..");
-#ifdef WC1_SDL
-    if (Wc1SdlUsingDosData())
+#ifdef SDL_PORT
+    if (SdlUsingDosData())
         DAT_0059ab34 = 1;
 #endif
     if (GetCurrentDiskDriveHook() > 'B')
@@ -166,7 +166,7 @@ int main(short argc, char **argv)
         nMusicVolumeSetting / 2]);
 
     if (launchMission != 0) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         if (init_mission(series, mission) != 0) {
             fprintf(stderr,
                     "Mission SERIES=%d MISSION=%d is absent or invalid.\n",
@@ -176,7 +176,7 @@ int main(short argc, char **argv)
 #else
         init_mission(series, mission);
 #endif
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         /* Use the normal campaign setup unless cockpitless mode was requested. */
         if (bCockpitEnabled != 0)
             LaunchPlayerShip();
@@ -186,8 +186,8 @@ int main(short argc, char **argv)
         return 0;
     }
 
-#ifdef WC1_SDL
-    Wc1SdlPlayDosStartupIntro();
+#ifdef SDL_PORT
+    SdlPlayDosStartupIntro();
 #endif
     bEscapePressed = 0;
     for (;;) {
@@ -240,8 +240,8 @@ unsigned int dump_buffer_to_screen(void)
 {
     short bottom;
 
-#ifdef WC1_SDL
-    Wc1SdlCompleteSpaceFrame();
+#ifdef SDL_PORT
+    SdlCompleteSpaceFrame();
 #endif
     if (bCockpitlessView > 0) {
         CopyViewportContents(&stSpaceBuffer, &stScreen);
@@ -969,8 +969,8 @@ unsigned int player_input(void)
         }
     }
 
-#ifdef WC1_SDL
-    Wc1SdlApplyJoystickFlightControls();
+#ifdef SDL_PORT
+    SdlApplyJoystickFlightControls();
 #endif
     stPreviousFlightInput =
         stLastPolledFlightInput;
@@ -1031,37 +1031,37 @@ unsigned int HandleFleetOverviewInput(void)
         break;
     case 0x48:
         rotate_about_i(-7,
-                       &aShipUpVector[WC1_EYE_OBJECT],
-                       &aShipForwardVector[WC1_EYE_OBJECT]);
+                       &aShipUpVector[EYE_OBJECT],
+                       &aShipForwardVector[EYE_OBJECT]);
         break;
     case 0x4b:
         rotate_about_j(7,
-                       &aShipRightVector[WC1_EYE_OBJECT],
-                       &aShipForwardVector[WC1_EYE_OBJECT]);
+                       &aShipRightVector[EYE_OBJECT],
+                       &aShipForwardVector[EYE_OBJECT]);
         break;
     case 0x4d:
         rotate_about_j(-7,
-                       &aShipRightVector[WC1_EYE_OBJECT],
-                       &aShipForwardVector[WC1_EYE_OBJECT]);
+                       &aShipRightVector[EYE_OBJECT],
+                       &aShipForwardVector[EYE_OBJECT]);
         break;
     case 0x4f:
         nCapitalShipViewDistance += 0x3200;
         break;
     case 0x50:
         rotate_about_i(7,
-                       &aShipUpVector[WC1_EYE_OBJECT],
-                       &aShipForwardVector[WC1_EYE_OBJECT]);
+                       &aShipUpVector[EYE_OBJECT],
+                       &aShipForwardVector[EYE_OBJECT]);
         break;
     case 0x52:
-        aShipUpVector[WC1_EYE_OBJECT].z = -0x100;
-        aShipForwardVector[WC1_EYE_OBJECT].y = 0x100;
-        aShipRightVector[WC1_EYE_OBJECT].x = 0x100;
-        aShipForwardVector[WC1_EYE_OBJECT].z = 0;
-        aShipForwardVector[WC1_EYE_OBJECT].x = 0;
-        aShipUpVector[WC1_EYE_OBJECT].y = 0;
-        aShipUpVector[WC1_EYE_OBJECT].x = 0;
-        aShipRightVector[WC1_EYE_OBJECT].z = 0;
-        aShipRightVector[WC1_EYE_OBJECT].y = 0;
+        aShipUpVector[EYE_OBJECT].z = -0x100;
+        aShipForwardVector[EYE_OBJECT].y = 0x100;
+        aShipRightVector[EYE_OBJECT].x = 0x100;
+        aShipForwardVector[EYE_OBJECT].z = 0;
+        aShipForwardVector[EYE_OBJECT].x = 0;
+        aShipUpVector[EYE_OBJECT].y = 0;
+        aShipUpVector[EYE_OBJECT].x = 0;
+        aShipRightVector[EYE_OBJECT].z = 0;
+        aShipRightVector[EYE_OBJECT].y = 0;
         break;
     default:
         bCurrentKey = (unsigned char)key;

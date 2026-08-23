@@ -1619,18 +1619,18 @@ unsigned int ShowGameOverScreen(void)
         FetchDiskPacketRetrying(9, 1, 0);
     cViewObject = (signed char)Explosion(0);
     nCameraViewMode = 4;
-    asObjectCollisionRadius[WC1_EYE_OBJECT] = 100;
+    asObjectCollisionRadius[EYE_OBJECT] = 100;
     ScaleFixedVector(
         &aShipForwardVector[cViewObject],
         -0x12c00, &cameraOffset);
     AddFixedVectors(
         &aShipPosition[cViewObject],
-        &cameraOffset, &aShipPosition[WC1_EYE_OBJECT]);
-    aShipUpVector[WC1_EYE_OBJECT] =
+        &cameraOffset, &aShipPosition[EYE_OBJECT]);
+    aShipUpVector[EYE_OBJECT] =
         aShipUpVector[cViewObject];
-    aShipForwardVector[WC1_EYE_OBJECT] = cameraOffset;
-    fix_objects_ijk(WC1_EYE_OBJECT);
-    zero_vector(&aShipVelocity[WC1_EYE_OBJECT]);
+    aShipForwardVector[EYE_OBJECT] = cameraOffset;
+    fix_objects_ijk(EYE_OBJECT);
+    zero_vector(&aShipVelocity[EYE_OBJECT]);
     set_eye_direction_and_position();
     distance = 700;
     generate_stars();
@@ -1660,7 +1660,7 @@ unsigned int ShowGameOverScreen(void)
     return 0;
 }
 
-#ifndef WC1_SDL
+#ifndef SDL_PORT
 
 /* Function start: 0x439C0E */
 /* No inbound reference is known in the shipped executable; this routine is
@@ -5617,4 +5617,4 @@ __declspec(naked) int CollectRasterClipColours(
 
 #else
 #include "screens_portable.inc"
-#endif /* !WC1_SDL */
+#endif /* !SDL_PORT */

@@ -4,8 +4,8 @@
  *  Address order is link order, so this list doubles as the reconstruction
  *  inventory: see src/map for the same list with the original addresses.
  */
-#ifndef WC1_FUNCS_H
-#define WC1_FUNCS_H
+#ifndef GAME_FUNCS_H
+#define GAME_FUNCS_H
 
 void SaveGamePalette(void);                                             /* 0x00401000 */
 void RestoreGamePalette(void);                                          /* 0x00401020 */
@@ -385,7 +385,7 @@ unsigned int hit_asteroid(short asteroid, short destructionChance);    /* 0x0041
 int object_collision(short obj);                                      /* 0x004130D0 */
 unsigned int object_intelligence(short obj);                           /* 0x00413880 */
 void EmitTextString(void (__stdcall *writer)(int), const char *text);   /* 0x00413A10 */
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 void FormatTextTokens(void (__stdcall *writer)(int),
                       const char *format, va_list *arguments);         /* 0x00413A40 */
 #else
@@ -898,7 +898,7 @@ unsigned int get_front_spot(short obj, unsigned short distance,
                             FixedVector *point);                       /* 0x00422EC0 */
 unsigned int get_rear_spot(short obj, unsigned short distance,
                            FixedVector *point);                        /* 0x00422F10 */
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 unsigned int close_behind(short range);
 #else
 unsigned int close_behind();                                          /* 0x00422F60 */
@@ -951,7 +951,7 @@ unsigned int free_constellation(void);                            /* 0x00424490 
 void init_vdus(void);                                                  /* 0x004244E0 */
 unsigned int InitializeCockpitResources(signed char mode);             /* 0x004245B0 */
 unsigned int free_cockpit(void);                                       /* 0x004249A0 */
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 unsigned int init_3Space_objects(short scene);
 #else
 unsigned int init_3Space_objects();                                    /* 0x00424A80 */
@@ -1027,8 +1027,8 @@ short LogMemoryUsage(void);                                               /* 0x0
 unsigned int ShowMemoryStatusDebug(void);                                 /* 0x004273C0 */
 void exit_squadron(const char *msg);                                    /* 0x00427370 */
 unsigned int GetJoystickButtonEdge(unsigned int a, short b);                    /* 0x004274C0 */
-#ifdef WC1_SDL
-int Wc1GameMain(short argc, char **argv);
+#ifdef SDL_PORT
+int GameMain(short argc, char **argv);
 #else
 int main(short argc, char **argv);                                      /* 0x004274E0 */
 #endif
@@ -1747,4 +1747,4 @@ void ix_streamer_set_trigger(char trigger);                           /* 0x00443
 void ix_streamer_force_trigger(char trigger);                         /* 0x0044342E */
 void ix_streamer_set_volume(unsigned short volume);                   /* 0x004435BE */
 
-#endif /* WC1_FUNCS_H */
+#endif /* GAME_FUNCS_H */

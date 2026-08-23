@@ -177,10 +177,10 @@ data, substitutes the reconstructed executable, downloads DREAMM when needed,
 and launches it in an emulated Windows 95 environment:
 
 ```sh
-make run WC1_ISO=/path/to/kilrathi-saga.iso
+make run GAME_ISO=/path/to/kilrathi-saga.iso
 ```
 
-Use `make debug WC1_ISO=/path/to/kilrathi-saga.iso` to start DREAMM's debugger.
+Use `make debug GAME_ISO=/path/to/kilrathi-saga.iso` to start DREAMM's debugger.
 
 ## Reconstruction workflow
 

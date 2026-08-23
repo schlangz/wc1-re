@@ -25,7 +25,7 @@ short MaxShort(short a, short b)
 /* Function start: 0x41D100 */
 void FreePacketAndClear(void *slot, unsigned short releaseFlags)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     void *packet;
 
     memcpy(&packet, slot, sizeof(packet));

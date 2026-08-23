@@ -3,16 +3,16 @@
 #include "video_internal.h"
 
 static SDL_Renderer *g_pSdlRenderer;
-static unsigned int g_dwWc1SdlStaticNoiseSeed = 0x1f123bb5U;
+static unsigned int g_dwSdlStaticNoiseSeed = 0x1f123bb5U;
 static SDL_Texture *g_pSdlFrameTexture;
 static Uint32 g_adwSdlFramePixels[
-    WC1_SDL_FRAME_WIDTH * WC1_SDL_FRAME_HEIGHT];
+    SDL_PORT_FRAME_WIDTH * SDL_PORT_FRAME_HEIGHT];
 
-int Wc1SdlInitializeVideo(SDL_Window *window)
+int SdlInitializeVideo(SDL_Window *window)
 {
-    Wc1SdlShutdownVideo();
-    if (Wc1SdlUsingGlRenderer())
-        return Wc1SdlGlRendererInitialize(window);
+    SdlShutdownVideo();
+    if (SdlUsingGlRenderer())
+        return SdlGlRendererInitialize(window);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
     g_pSdlRenderer =
         SDL_CreateRenderer(window, -1,
@@ -26,10 +26,10 @@ int Wc1SdlInitializeVideo(SDL_Window *window)
     g_pSdlFrameTexture =
         SDL_CreateTexture(g_pSdlRenderer, SDL_PIXELFORMAT_ARGB8888,
                           SDL_TEXTUREACCESS_STREAMING,
-                          WC1_SDL_FRAME_WIDTH,
-                          WC1_SDL_FRAME_HEIGHT);
+                          SDL_PORT_FRAME_WIDTH,
+                          SDL_PORT_FRAME_HEIGHT);
     if (g_pSdlFrameTexture == 0) {
-        Wc1SdlShutdownVideo();
+        SdlShutdownVideo();
         return 0;
     }
     SDL_SetRenderDrawColor(g_pSdlRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
@@ -38,7 +38,7 @@ int Wc1SdlInitializeVideo(SDL_Window *window)
     return 1;
 }
 
-static int Wc1SdlComputeFrameDestRect(SDL_Rect *dest)
+static int SdlComputeFrameDestRect(SDL_Rect *dest)
 {
     int bottom;
     int height;
@@ -47,15 +47,15 @@ static int Wc1SdlComputeFrameDestRect(SDL_Rect *dest)
     if (SDL_GetRendererOutputSize(g_pSdlRenderer, &width, &height) != 0 ||
         width < 1 || height < 1)
         return 0;
-    Wc1SdlCalculateOutputViewport(width, height, &dest->x, &bottom, &dest->w,
+    SdlCalculateOutputViewport(width, height, &dest->x, &bottom, &dest->w,
                                   &dest->h);
     dest->y = height - bottom - dest->h;
     return 1;
 }
 
-void Wc1SdlShutdownVideo(void)
+void SdlShutdownVideo(void)
 {
-    Wc1SdlGlRendererShutdown();
+    SdlGlRendererShutdown();
     if (g_pSdlFrameTexture != 0) {
         SDL_DestroyTexture(g_pSdlFrameTexture);
         g_pSdlFrameTexture = 0;
@@ -66,19 +66,19 @@ void Wc1SdlShutdownVideo(void)
     }
 }
 
-int Wc1SdlPresentIndexedFrame(const unsigned char *pixels,
+int SdlPresentIndexedFrame(const unsigned char *pixels,
                               const unsigned char *palette)
 {
     SDL_Rect dest;
     int pixel;
 
-    if (Wc1SdlUsingGlRenderer())
-        return Wc1SdlGlRendererPresent(pixels, palette);
+    if (SdlUsingGlRenderer())
+        return SdlGlRendererPresent(pixels, palette);
     if (g_pSdlRenderer == 0 || g_pSdlFrameTexture == 0 || pixels == 0 ||
-        palette == 0 || !Wc1SdlComputeFrameDestRect(&dest))
+        palette == 0 || !SdlComputeFrameDestRect(&dest))
         return 0;
     pixel = 0;
-    while (pixel < WC1_SDL_FRAME_WIDTH * WC1_SDL_FRAME_HEIGHT) {
+    while (pixel < SDL_PORT_FRAME_WIDTH * SDL_PORT_FRAME_HEIGHT) {
         int paletteOffset;
         unsigned char colour;
 
@@ -92,7 +92,7 @@ int Wc1SdlPresentIndexedFrame(const unsigned char *pixels,
         pixel++;
     }
     if (SDL_UpdateTexture(g_pSdlFrameTexture, 0, g_adwSdlFramePixels,
-                          WC1_SDL_FRAME_WIDTH *
+                          SDL_PORT_FRAME_WIDTH *
                               (int)sizeof(Uint32)) != 0)
         return 0;
     if (SDL_RenderClear(g_pSdlRenderer) != 0)
@@ -103,19 +103,19 @@ int Wc1SdlPresentIndexedFrame(const unsigned char *pixels,
     return 1;
 }
 
-void Wc1SdlWaitForVerticalBlank(void)
+void SdlWaitForVerticalBlank(void)
 {
     SDL_Rect dest;
 
-    if (Wc1SdlUsingGlRenderer()) {
-        Wc1SdlGlRendererWaitForVerticalBlank();
+    if (SdlUsingGlRenderer()) {
+        SdlGlRendererWaitForVerticalBlank();
         return;
     }
     if (g_pSdlRenderer == 0 || g_pSdlFrameTexture == 0) {
         SDL_Delay(1);
         return;
     }
-    if (!Wc1SdlComputeFrameDestRect(&dest)) {
+    if (!SdlComputeFrameDestRect(&dest)) {
         SDL_Delay(1);
         return;
     }
@@ -124,38 +124,38 @@ void Wc1SdlWaitForVerticalBlank(void)
     SDL_RenderPresent(g_pSdlRenderer);
 }
 
-void Wc1SdlBeginSpaceFrame(
+void SdlBeginSpaceFrame(
     const struct ScreenViewportGeometry *geometry, int viewportMode,
     int fullViewportCopy, unsigned char clearColour)
 {
-    if (Wc1SdlUsingGlRenderer()) {
-        Wc1SdlGlRendererBeginSpaceFrame(
+    if (SdlUsingGlRenderer()) {
+        SdlGlRendererBeginSpaceFrame(
             geometry, viewportMode, fullViewportCopy, clearColour);
     }
 }
 
-void Wc1SdlCompleteSpaceFrame(void)
+void SdlCompleteSpaceFrame(void)
 {
-    if (Wc1SdlUsingGlRenderer())
-        Wc1SdlGlRendererCompleteSpaceFrame();
+    if (SdlUsingGlRenderer())
+        SdlGlRendererCompleteSpaceFrame();
 }
 
-void Wc1SdlCancelSpaceFrame(void)
+void SdlCancelSpaceFrame(void)
 {
     /* RunSpaceFlight calls this when the spaceflight session ends. */
-    Wc1SdlEndJoystickSpaceflight();
-    if (Wc1SdlUsingGlRenderer())
-        Wc1SdlGlRendererCancelSpaceFrame();
+    SdlEndJoystickSpaceflight();
+    if (SdlUsingGlRenderer())
+        SdlGlRendererCancelSpaceFrame();
 }
 
-int Wc1SdlRecordSpaceSprite(
+int SdlRecordSpaceSprite(
     const struct Viewport *viewport, float x, float y,
     unsigned char *shape, short frame, short angle, short scale,
     short flip)
 {
-    if (!Wc1SdlUsingGlRenderer())
+    if (!SdlUsingGlRenderer())
         return 0;
-    return Wc1SdlGlRendererRecordSpaceSprite(
+    return SdlGlRendererRecordSpaceSprite(
         viewport, x, y, shape, frame, angle, scale, flip);
 }
 
@@ -168,15 +168,15 @@ int Wc1SdlRecordSpaceSprite(
  * The generator is local on purpose.  Drawing thousands of pixels through the
  * game's RandomBelowOrEqual would consume its sequence and change gameplay,
  * so the port keeps its own. */
-static unsigned int Wc1SdlNextStaticNoise(void)
+static unsigned int SdlNextStaticNoise(void)
 {
-    g_dwWc1SdlStaticNoiseSeed ^= g_dwWc1SdlStaticNoiseSeed << 13;
-    g_dwWc1SdlStaticNoiseSeed ^= g_dwWc1SdlStaticNoiseSeed >> 17;
-    g_dwWc1SdlStaticNoiseSeed ^= g_dwWc1SdlStaticNoiseSeed << 5;
-    return g_dwWc1SdlStaticNoiseSeed;
+    g_dwSdlStaticNoiseSeed ^= g_dwSdlStaticNoiseSeed << 13;
+    g_dwSdlStaticNoiseSeed ^= g_dwSdlStaticNoiseSeed >> 17;
+    g_dwSdlStaticNoiseSeed ^= g_dwSdlStaticNoiseSeed << 5;
+    return g_dwSdlStaticNoiseSeed;
 }
 
-void Wc1SdlDrawViewportStatic(struct Viewport *viewport, int effect,
+void SdlDrawViewportStatic(struct Viewport *viewport, int effect,
                               unsigned short colour)
 {
     unsigned int sample;
@@ -191,7 +191,7 @@ void Wc1SdlDrawViewportStatic(struct Viewport *viewport, int effect,
     bright = (short)(effect >= 3 ? 1 : 2);
     for (y = viewport->top; y <= viewport->bottom; y++) {
         for (x = viewport->left; x <= viewport->right; x++) {
-            sample = Wc1SdlNextStaticNoise() >> 16;
+            sample = SdlNextStaticNoise() >> 16;
             if ((short)(sample & 3) > bright)
                 continue;
             DrawViewportPixel(viewport, x, y,

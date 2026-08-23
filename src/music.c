@@ -24,7 +24,7 @@ unsigned int parse_view_script(void)
         }
         switch (command) {
         case 0:
-#ifdef WC1_SDL
+#ifdef SDL_PORT
             aShipPosition[61].x =
                 (int)*pViewScript++ * 0x100;
             aShipPosition[61].y =
@@ -46,7 +46,7 @@ unsigned int parse_view_script(void)
             alter_roll(*pViewScript++, 61);
             break;
         case 2:
-#ifdef WC1_SDL
+#ifdef SDL_PORT
             ScaleFixedVector(&aShipForwardVector[61],
                              (int)*pViewScript++ * 0x100,
                              &aShipVelocity[61]);
@@ -87,7 +87,7 @@ unsigned int parse_view_script(void)
             alter_yaw(*pViewScript++, 63);
             alter_pitch(*pViewScript++, 63);
             alter_roll(*pViewScript++, 63);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
             ScaleFixedVector(&aShipForwardVector[63],
                              (int)*pViewScript++ * 0x100,
                              &vector);
@@ -645,7 +645,7 @@ void DrawTargetRangeReadout(void)
     const char *rangeText;
 
     target = acShipTarget[0];
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     /* The original tests the table before the -1 sentinel.  At target -1 it
        reads the zero-filled gap at 0x0059c3bc, so the comparison is false. */
     if (target != -1 &&
@@ -1298,7 +1298,7 @@ void servicetrack(void)
 
     gametrack();
     if (nFlightSoundEffectsEnabled != 0) {
-        for (object = 0; object < WC1_SPACE_OBJECT_COUNT; object++) {
+        for (object = 0; object < SPACE_OBJECT_COUNT; object++) {
             if (object == nPassingShipSoundObject) {
                 if (aeObjectClass[object] !=
                         OBJECT_CLASS_SHIP ||
@@ -1327,10 +1327,10 @@ void servicetrack(void)
                     AddFixedVectors(&aShipPosition[object],
                                     &travel, &futurePosition);
                     ComputeVectorDelta(
-                        &aShipPosition[WC1_EYE_OBJECT],
+                        &aShipPosition[EYE_OBJECT],
                         &futurePosition, &travel);
                     ComputeVectorDelta(
-                        &aShipPosition[WC1_EYE_OBJECT],
+                        &aShipPosition[EYE_OBJECT],
                         &aShipPosition[object],
                         &futurePosition);
                     if (dot_product(&travel, &futurePosition) < 0xdd) {
@@ -1408,28 +1408,28 @@ void PlaySfxWaveFileByNumber(int soundNumber, int sourceObject, int looping)
     FixedVector delta;
     int distance;
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     if (SdlHandlesGameSoundEffects()) {
         SdlPlayGameSoundEffect(soundNumber, sourceObject, looping);
         return;
     }
-    if (Wc1SdlUsingDosData()) {
+    if (SdlUsingDosData()) {
         int volume;
 
         volume = 127;
         if (sourceObject != -1) {
             if (sourceObject < 0 ||
-                sourceObject >= WC1_SPACE_OBJECT_COUNT)
+                sourceObject >= SPACE_OBJECT_COUNT)
                 return;
             ComputeVectorDelta(
-                &aShipPosition[WC1_EYE_OBJECT],
+                &aShipPosition[EYE_OBJECT],
                 &aShipPosition[sourceObject], &delta);
             distance = (int)((Vector_magnitude(&delta) / 500L) >> 8);
             volume -= distance;
             if (volume < 0)
                 volume = 0;
         }
-        if (volume >= 10 && Wc1SdlPlayDosSoundEffect(
+        if (volume >= 10 && SdlPlayDosSoundEffect(
                 soundNumber, volume, 64, sourceObject, looping)) {
             aiSoundEffectSourceActive[sourceObject + 1] = 1;
             if (sourceObject == -1)
@@ -1440,7 +1440,7 @@ void PlaySfxWaveFileByNumber(int soundNumber, int sourceObject, int looping)
 #endif
 
     if (sourceObject != -1) {
-        ComputeVectorDelta(&aShipPosition[WC1_EYE_OBJECT],
+        ComputeVectorDelta(&aShipPosition[EYE_OBJECT],
                            &aShipPosition[sourceObject],
                            &delta);
         distance = Vector_magnitude(&delta);

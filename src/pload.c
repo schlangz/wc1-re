@@ -43,7 +43,7 @@ void * __stdcall PacketLoad(const char *filename, short section,
             }
             break;
         case 1:
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         {
             unsigned char sizeBytes[4];
             unsigned char *compressedData;
@@ -85,7 +85,7 @@ void * __stdcall PacketLoad(const char *filename, short section,
             pLastPacketAllocation = packet;
             if (packet == 0) {
                 nPacketError = 4;
-            } else if (!Wc1SdlDecompressOriginLzw(
+            } else if (!SdlDecompressOriginLzw(
                            compressedData, compressedSize, packet,
                            outputSize, &writtenSize)) {
                 if (allocatedPacket != 0)

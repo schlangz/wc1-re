@@ -113,7 +113,7 @@ void EmitTextString(void (__stdcall *writer)(int), const char *text)
 
 /* Function start: 0x413A40 */
 void FormatTextTokens(void (__stdcall *writer)(int),
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                       const char *format, va_list *arguments)
 #else
                       const char *format, unsigned long *arguments)
@@ -131,7 +131,7 @@ void FormatTextTokens(void (__stdcall *writer)(int),
             character = (signed char)*format++;
             switch (character) {
             case 'B':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 pCurrentTextContext->backgroundColour =
                     (unsigned char)va_arg(*arguments, int);
 #else
@@ -140,7 +140,7 @@ void FormatTextTokens(void (__stdcall *writer)(int),
 #endif
                 break;
             case 'D':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 text = _ltoa(va_arg(*arguments, long), number, 10);
 #else
                 text = _ltoa((long)*arguments++, number, 10);
@@ -148,7 +148,7 @@ void FormatTextTokens(void (__stdcall *writer)(int),
                 EmitTextString(writer, text);
                 break;
             case 'F':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 pCurrentTextContext->colour =
                     (unsigned char)va_arg(*arguments, int);
 #else
@@ -157,7 +157,7 @@ void FormatTextTokens(void (__stdcall *writer)(int),
 #endif
                 break;
             case 'J':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 pCurrentTextContext->alignment =
                     (unsigned char)va_arg(*arguments, int);
 #else
@@ -169,7 +169,7 @@ void FormatTextTokens(void (__stdcall *writer)(int),
                 DrawTextString(pCurrentTextContext->text);
                 break;
             case 'U':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 text = _ultoa(va_arg(*arguments, unsigned long), number, 10);
 #else
                 text = _ultoa(*arguments++, number, 10);
@@ -177,7 +177,7 @@ void FormatTextTokens(void (__stdcall *writer)(int),
                 EmitTextString(writer, text);
                 break;
             case 'X':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 pCurrentTextContext->cursorX =
                     (short)va_arg(*arguments, int);
 #else
@@ -186,7 +186,7 @@ void FormatTextTokens(void (__stdcall *writer)(int),
 #endif
                 break;
             case 'Y':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 pCurrentTextContext->cursorY =
                     (short)va_arg(*arguments, int);
 #else
@@ -195,14 +195,14 @@ void FormatTextTokens(void (__stdcall *writer)(int),
 #endif
                 break;
             case 'c':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 writer((short)va_arg(*arguments, int));
 #else
                 writer((short)*arguments++);
 #endif
                 break;
             case 'd':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 text = _itoa((short)va_arg(*arguments, int), number, 10);
 #else
                 text = _itoa((int)(short)*arguments++, number, 10);
@@ -210,7 +210,7 @@ void FormatTextTokens(void (__stdcall *writer)(int),
                 EmitTextString(writer, text);
                 break;
             case 's':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 text = va_arg(*arguments, char *);
 #else
                 text = (char *)*arguments++;
@@ -218,7 +218,7 @@ void FormatTextTokens(void (__stdcall *writer)(int),
                 EmitTextString(writer, text);
                 break;
             case 'u':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 text = _ultoa((unsigned short)va_arg(*arguments, unsigned int),
                               number, 10);
 #else
@@ -227,7 +227,7 @@ void FormatTextTokens(void (__stdcall *writer)(int),
                 EmitTextString(writer, text);
                 break;
             case 'x':
-#ifdef WC1_SDL
+#ifdef SDL_PORT
                 text = _ultoa((unsigned short)va_arg(*arguments, unsigned int),
                               number, 16);
 #else
@@ -247,7 +247,7 @@ void FormatTextTokens(void (__stdcall *writer)(int),
 /* Function start: 0x413C40 */
 void DrawFormattedText(const char *format, ...)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     va_list arguments;
 
     va_start(arguments, format);
@@ -268,7 +268,7 @@ void FormatTextBufferFromStart(const char *format, ...)
 {
     pCurrentTextContext->textCursor =
         pCurrentTextContext->text;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     {
         va_list arguments;
 
@@ -289,7 +289,7 @@ void FormatTextBufferFromStart(const char *format, ...)
 /* Function start: 0x413CB0 */
 void AppendFormattedText(const char *format, ...)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     va_list arguments;
 
     va_start(arguments, format);
@@ -310,7 +310,7 @@ void FatalErrorAndExit(const char *format, ...)
 {
     char text[0xfc];
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     va_list arguments;
 
     va_start(arguments, format);
@@ -349,7 +349,7 @@ void EraseCockpitReadoutRegion(Viewport *viewport, short left,
 /* Function start: 0x413DA0 */
 void vdu_polygon(signed char bar, short percent)
 {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     const CockpitBarDefinition *definition;
 #else
     int index;
@@ -365,7 +365,7 @@ void vdu_polygon(signed char bar, short percent)
     signed char emptyFrame;
     signed char swapFrame;
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     definition = &aaCockpitBars[
         (int)cCockpitView][(int)bar];
     length = definition->length;
@@ -374,14 +374,14 @@ void vdu_polygon(signed char bar, short percent)
     length = aaCockpitBars[0][index].length;
 #endif
     extent = (short)(((int)percent * (int)length) / 100);
-#ifdef WC1_SDL
+#ifdef SDL_PORT
     left = definition->left;
 #else
     left = aaCockpitBars[0][index].left;
 #endif
     stCockpitBar.left = left;
     if (left != -99) {
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         right = definition->right;
         top = definition->top;
         bottom = definition->bottom;
@@ -393,7 +393,7 @@ void vdu_polygon(signed char bar, short percent)
         stCockpitBar.right = right;
         stCockpitBar.top = top;
         stCockpitBar.bottom = bottom;
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         emptyFrame = (signed char)definition->emptyFrame;
         filledFrame = (signed char)definition->filledFrame;
         direction = definition->direction;
@@ -1816,7 +1816,7 @@ void target_locking(signed char target)
             lock_off();
             return;
         }
-#ifdef WC1_SDL
+#ifdef SDL_PORT
         /* With the -1 sentinel, the original reads the zero-filled word at
            0x0059CAAA just before the weapon table and then turns locking off.
            Native globals have sanitizer redzones, so make that result explicit. */
@@ -2146,15 +2146,15 @@ void draw_nav_pointer(void)
     }
     objectivePosition = aMissionObjectives[
         (signed char)cCurrentObjective].position;
-    ComputeVectorDelta(&aShipPosition[WC1_EYE_OBJECT],
+    ComputeVectorDelta(&aShipPosition[EYE_OBJECT],
                        &objectivePosition, &direction);
     distance = Vector_magnitude(&direction);
-    if (asObjectCollisionRadius[WC1_EYE_OBJECT] * 0x100 >=
+    if (asObjectCollisionRadius[EYE_OBJECT] * 0x100 >=
         distance)
         return;
     transform_to_objects_frame(&direction, &viewPosition,
-                               WC1_EYE_OBJECT);
-    if (asObjectCollisionRadius[WC1_EYE_OBJECT] * 0x100 >
+                               EYE_OBJECT);
+    if (asObjectCollisionRadius[EYE_OBJECT] * 0x100 >
         viewPosition.z)
         return;
     if (DivideFixed(viewPosition.z, distance) < 0x94)

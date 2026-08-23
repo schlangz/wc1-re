@@ -9,7 +9,7 @@
 extern __declspec(dllimport) BOOL __stdcall ImmDisableIME(DWORD threadId);
 #endif
 
-static int Wc1SdlParsePortArguments(int *argumentCount, char **arguments,
+static int SdlParsePortArguments(int *argumentCount, char **arguments,
                                     int *useEnhancedRenderer)
 {
     char *argument;
@@ -24,17 +24,17 @@ static int Wc1SdlParsePortArguments(int *argumentCount, char **arguments,
         if (strcmp(argument, "--enhanced") == 0) {
             *useEnhancedRenderer = 1;
         } else if (strcmp(argument, "--joystick-debug") == 0) {
-            Wc1SdlEnableJoystickDebug();
+            SdlEnableJoystickDebug();
         } else if (strcmp(argument, "--joystick-rumble") == 0) {
-            Wc1SdlEnableJoystickRumble();
+            SdlEnableJoystickRumble();
         } else if (strncmp(argument, "--joystick-mode=", 16) == 0) {
-            if (!Wc1SdlSetJoystickMode(argument + 16)) {
+            if (!SdlSetJoystickMode(argument + 16)) {
                 fprintf(stderr, "Unknown joystick mode: %s\n",
                         argument + 16);
                 return 0;
             }
         } else if (strncmp(argument, "--joystick-axes=", 16) == 0) {
-            if (!Wc1SdlSetJoystickAxesMode(argument + 16)) {
+            if (!SdlSetJoystickAxesMode(argument + 16)) {
                 fprintf(stderr, "Unknown joystick axes mode: %s\n",
                         argument + 16);
                 return 0;
@@ -49,7 +49,7 @@ static int Wc1SdlParsePortArguments(int *argumentCount, char **arguments,
     return 1;
 }
 
-static void Wc1SdlApplyLegacyArguments(int argumentCount, char **arguments)
+static void SdlApplyLegacyArguments(int argumentCount, char **arguments)
 {
     const char *argument;
     char command;
@@ -84,7 +84,7 @@ static void Wc1SdlApplyLegacyArguments(int argumentCount, char **arguments)
     }
 }
 
-static int Wc1SdlRunRuntimeChecks(void)
+static int SdlRunRuntimeChecks(void)
 {
     aShipWeapons[1][0] = 2;
     remove_weapon(1, 0);
@@ -140,12 +140,12 @@ int main(int argumentCount, char **arguments)
 #ifdef _WIN32
     ImmDisableIME((DWORD)-1);
 #endif
-    if (!Wc1SdlParsePortArguments(&argumentCount, arguments,
+    if (!SdlParsePortArguments(&argumentCount, arguments,
                                    &useEnhancedRenderer))
         return 1;
     if (useEnhancedRenderer) {
-        Wc1SdlSetVideoBackend(
-            WC1_SDL_VIDEO_BACKEND_GL_SHARP_BILINEAR);
+        SdlSetVideoBackend(
+            SDL_PORT_VIDEO_BACKEND_GL_SHARP_BILINEAR);
     }
     checkOnly = argumentCount == 2 && strcmp(arguments[1], "--check") == 0;
     /* The build defines SDL_MAIN_HANDLED, so tell SDL the process is already
@@ -158,7 +158,7 @@ int main(int argumentCount, char **arguments)
     }
 
     windowFlags = SDL_WINDOW_RESIZABLE;
-    if (!Wc1SdlConfigureVideoWindow(&windowFlags)) {
+    if (!SdlConfigureVideoWindow(&windowFlags)) {
         fprintf(stderr, "SDL video configuration failed: %s\n",
                 SDL_GetError());
         SDL_Quit();
@@ -181,18 +181,18 @@ int main(int argumentCount, char **arguments)
 
     DIBinstall((HWND)window);
     hMainWindow = (HWND)window;
-    Wc1SdlStartEventPump();
+    SdlStartEventPump();
     if (checkOnly) {
-        gameResult = Wc1SdlRunRuntimeChecks();
+        gameResult = SdlRunRuntimeChecks();
     } else {
         CheckLauncherAndConfig();
-        usingDosData = Wc1SdlUsingDosData();
+        usingDosData = SdlUsingDosData();
         if (usingDosData) {
             /* DOS audio drivers cannot be used by the native SDL2 host. */
             bIxAudioEnabled = 0;
         }
         if (usingDosData || useEnhancedRenderer) {
-            if (!Wc1SdlInitializeOriginFxAudio(usingDosData)) {
+            if (!SdlInitializeOriginFxAudio(usingDosData)) {
                 if (usingDosData) {
                     fprintf(stderr,
                             "DOS audio is unavailable.\n");
@@ -202,7 +202,7 @@ int main(int argumentCount, char **arguments)
                 }
             }
         }
-        Wc1SdlApplyLegacyArguments(argumentCount, arguments);
+        SdlApplyLegacyArguments(argumentCount, arguments);
         MonoDebug_install();
         InitializeAudioSystem((HWND)window);
         InitializeAudioStreamer((HWND)window);
@@ -212,18 +212,18 @@ int main(int argumentCount, char **arguments)
         nSessionStartTime = (unsigned int)time(0);
         pEventManagerPump = 0;
         SDL_ShowCursor(SDL_DISABLE);
-        gameResult = Wc1GameMain((short)(argumentCount - 1), arguments);
-        Wc1SdlSetMouseGrab(0);
+        gameResult = GameMain((short)(argumentCount - 1), arguments);
+        SdlSetMouseGrab(0);
         SDL_ShowCursor(SDL_ENABLE);
         DestroyGlobalDebugOverlayConsole();
         if ((dwStreamerState & 1) != 0)
             ix_streamer_destroy();
         ServiceAudioStream();
-        Wc1SdlShutdownOriginFxAudio();
+        SdlShutdownOriginFxAudio();
     }
 
     DIBunInstall();
-    Wc1SdlShutdownJoysticks();
+    SdlShutdownJoysticks();
     SDL_DestroyWindow(window);
     SDL_Quit();
     return gameResult;

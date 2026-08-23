@@ -20,7 +20,7 @@
 #ifndef IX_H
 #define IX_H
 
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 #include "wc1sdl.h"
 #else
 #include <windows.h>   /* CRITICAL_SECTION, used by the stream/voice state below */
@@ -394,7 +394,7 @@ struct IxStreamFile {
 };
 
 extern "C" int ix_streamer_init(void);           /* 0x00442750 */
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 extern "C" void ix_streamer_destroy(void);       /* 0x0044286F */
 #else
 void ix_streamer_destroy(void);                  /* 0x0044286F */
@@ -429,7 +429,7 @@ unsigned int ix_thread_service_streams(void);     /* 0x004441C6 */
 void ix_thread_advance_audio_chunk(void);         /* 0x00444316 */
 void ix_thread_lock_stream_buffer(void);         /* 0x004445C9 */
 unsigned int ix_thread_get_audio_chunk_size(void); /* 0x004446A6 */
-#ifdef WC1_SDL
+#ifdef SDL_PORT
 extern "C" void ix_lzo1x_decompress(
     unsigned char *source, unsigned char *destination,
     unsigned int destinationBytes, unsigned int sourceBytes); /* 0x004614C0 */

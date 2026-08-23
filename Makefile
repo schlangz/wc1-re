@@ -134,7 +134,7 @@ MODERN_LZO_LIBS = $(shell pkg-config --libs lzo2 2>/dev/null)
 # Windows, which needs SDL2main.a to supply a WinMain wrapper.  The port has
 # its own main and calls SDL_SetMainReady() itself, so the rename is only a
 # way to fail the link.
-MODERN_CPPFLAGS = -DWC1_SDL=1 -DSDL_MAIN_HANDLED -Iinclude \
+MODERN_CPPFLAGS = -DSDL_PORT=1 -DSDL_MAIN_HANDLED -Iinclude \
 	$(MODERN_SDL_CFLAGS) \
 	$(MODERN_LZO_CFLAGS) $(addprefix -I,$(MODERN_LZO_INCLUDEDIR))
 MODERN_TEST_CPPFLAGS = -DSDL_MAIN_HANDLED $(MODERN_SDL_CFLAGS)
@@ -233,13 +233,13 @@ DREAMM_STAMP = $(DREAMM_DIR)/.$(DREAMM_ARCHIVE).stamp
 #
 # The disc is mounted at D: when present: the binary really does look for it
 # (LocateStreamsDirOnDisc, FindCdRomDriveByVolumeLabel, PromptInsertCorrectCd),
-# and the streaming music lives there.  Point WC1_ISO at an image or a directory.
+# and the streaming music lives there.  Point GAME_ISO at an image or a directory.
 RUN_DIR = data/full
 # Any disc image dropped in data/ or data/full/ is picked up automatically.
 # The recipes cd into RUN_DIR, so the mount path is made relative to it.
-WC1_ISO ?= $(firstword $(wildcard data/*.iso data/*.ISO data/full/*.iso data/full/*.ISO))
+GAME_ISO ?= $(firstword $(wildcard data/*.iso data/*.ISO data/full/*.iso data/full/*.ISO))
 DREAMM_MOUNTS = -mount rw:C=hd \
-                $(if $(WC1_ISO),-mount d=$(patsubst $(RUN_DIR)/%,%,$(patsubst data/%,../%,$(WC1_ISO))))
+                $(if $(GAME_ISO),-mount d=$(patsubst $(RUN_DIR)/%,%,$(patsubst data/%,../%,$(GAME_ISO))))
 
 # ---------------------------------------------------------------------------
 # Source order
@@ -858,13 +858,13 @@ dreamm: $(DREAMM_BIN)
 # just that -- 142 MB of the disc's 634 -- rather than asking for a separate
 # install.  bsdtar reads ISO9660 directly and ships with macOS and most Linuxes.
 $(RUN_DIR)/GAMEDAT:
-	@test -n "$(WC1_ISO)" || \
-		(echo "Error: no disc image found. Put the Kilrathi Saga ISO in data/ or set WC1_ISO=." >&2 && exit 1)
+	@test -n "$(GAME_ISO)" || \
+		(echo "Error: no disc image found. Put the Kilrathi Saga ISO in data/ or set GAME_ISO=." >&2 && exit 1)
 	@command -v bsdtar >/dev/null 2>&1 || \
 		(echo "Error: bsdtar not found; needed to read the ISO." >&2 && exit 1)
-	@echo "Extracting WC1 from $(WC1_ISO)..."
+	@echo "Extracting WC1 from $(GAME_ISO)..."
 	@mkdir -p "$(RUN_DIR)"
-	@bsdtar -xf "$(WC1_ISO)" -C "$(RUN_DIR)" --strip-components=1 WC1
+	@bsdtar -xf "$(GAME_ISO)" -C "$(RUN_DIR)" --strip-components=1 WC1
 
 run-check: $(RUN_DIR)/GAMEDAT
 	@mkdir -p "$(RUN_DIR)/hd"
