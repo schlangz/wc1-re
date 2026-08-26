@@ -137,8 +137,21 @@ int SdlGetAsyncKeyState(int virtualKey)
         return (keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT])
             ? 0x8000 : 0;
     case VK_CONTROL:
-        return (keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL])
-            ? 0x8000 : 0;
+        if (!keys[SDL_SCANCODE_LCTRL] && !keys[SDL_SCANCODE_RCTRL])
+            return 0;
+        /* The SDL2 port balances audio itself and retains only Ctrl+S and
+           Ctrl+M as audio controls.  Let Ctrl+direction keys continue to
+           behave as flight directions instead of changing stored levels. */
+        if (keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_RIGHT] ||
+            keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_DOWN] ||
+            keys[SDL_SCANCODE_HOME] || keys[SDL_SCANCODE_PAGEUP] ||
+            keys[SDL_SCANCODE_END] || keys[SDL_SCANCODE_PAGEDOWN] ||
+            keys[SDL_SCANCODE_KP_1] || keys[SDL_SCANCODE_KP_2] ||
+            keys[SDL_SCANCODE_KP_3] || keys[SDL_SCANCODE_KP_4] ||
+            keys[SDL_SCANCODE_KP_6] || keys[SDL_SCANCODE_KP_7] ||
+            keys[SDL_SCANCODE_KP_8] || keys[SDL_SCANCODE_KP_9])
+            return 0;
+        return 0x8000;
     case VK_CLEAR:
         scanCode = SDL_SCANCODE_KP_5;
         break;

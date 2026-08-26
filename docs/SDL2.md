@@ -15,6 +15,10 @@ resources, `MUSIC.MID`, `WINGLDR.TIM`, AdLib music, and synthesized OriginFX
 effects. In-flight sampled and synthesized effects use camera-relative stereo
 panning; synthesized effects retain distance falloff.
 
+Kilrathi Saga wave effects receive 6 dB of mix headroom so full-scale and
+overlapping weapon sounds do not mask the streamed music. The DOS OriginFX
+path retains its separate synthesized music-and-effects mix.
+
 Development builds use ASan and UBSan. Release builds select
 `MODERN_RELEASE=1`.
 

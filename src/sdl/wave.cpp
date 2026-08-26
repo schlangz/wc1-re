@@ -2,6 +2,7 @@
 
 #define SDL_WAVE_CENTRE_PAN 64
 #define SDL_WAVE_MAXIMUM_PAN 127
+#define SDL_WAVE_SOUND_EFFECT_GAIN_DIVISOR 2
 
 static unsigned short g_nSdlPendingWavePan;
 static int g_nSdlPendingWavePanDepth;
@@ -31,7 +32,11 @@ extern "C" void SdlPlayWaveWithPan(
     g_nSdlPendingWavePan = (unsigned short)(
         (SDL_WAVE_CENTRE_PAN - pan) * 0x100);
     g_nSdlPendingWavePanDepth++;
-    playWAVE(filename, looping, volume);
+    /* The shipped effects peak at full scale while streamed music retains
+       roughly 8 dB of headroom.  Reserve 6 dB for the music before ix mixes
+       overlapping effects, notably the player's paired weapon sounds. */
+    playWAVE(filename, looping,
+             volume / SDL_WAVE_SOUND_EFFECT_GAIN_DIVISOR);
     g_nSdlPendingWavePanDepth = previousDepth;
     g_nSdlPendingWavePan = previousPan;
 }

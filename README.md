@@ -70,6 +70,7 @@ active; the rest need a switch, and switches can be combined.
 | Resizable window, fullscreen toggle, and mouse capture | always on |
 | Aspect-correct 4:3 presentation and pointer mapping | always on |
 | Camera-relative left/right panning for in-flight sound effects | always on |
+| Kilrathi Saga sound effects balanced against streamed music | always on |
 | Background planets drawn with correct per-object scaling (WCDX fix) | always on |
 | Static on knocked-out cockpit displays, which the 1996 port dropped | always on |
 | Landing on the *Tiger's Claw* from any bearing; retail also required the Claw's bow to face you | always on |
@@ -108,6 +109,8 @@ remains the default.
 | `Cmd+Enter` (macOS) | Toggle fullscreen |
 | `Alt+Enter` (Windows and Linux) | Toggle fullscreen |
 | `Cmd+Q` (macOS) | Quit the game |
+| `Ctrl+S` (spaceflight) | Toggle sound effects |
+| `Ctrl+M` (spaceflight) | Toggle music |
 | Gamepad Start (spaceflight) | Pause or resume |
 | Gamepad Back | Escape/back |
 | Gamepad Y (`Y/N` prompts) | Confirm Yes |

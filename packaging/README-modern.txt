@@ -15,6 +15,9 @@ OriginFX music and synthesized sound effects through an embedded YM3812
 (AdLib) emulator using MUSIC.MID and WINGLDR.TIM. No external MIDI synthesizer
 or sound bank is required. DOS game-data support remains partial.
 
+Kilrathi Saga sound effects are balanced against the streamed music. During
+spaceflight, Ctrl+M toggles music and Ctrl+S toggles sound effects.
+
 The macOS archives are ad-hoc signed, not notarized with an Apple developer
 certificate. macOS may therefore require the usual confirmation for software
 downloaded outside the App Store.
