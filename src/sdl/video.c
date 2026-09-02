@@ -8,39 +8,24 @@ static SDL_Texture *g_pSdlFrameTexture;
 static Uint32 g_adwSdlFramePixels[
     SDL_PORT_FRAME_WIDTH * SDL_PORT_FRAME_HEIGHT];
 
-/* EGA dither filter (--ega). Not a retail feature -- WC1's real EGA mode
- * has never been reconstructed here; this reproduces the *look* of it on
- * top of the VGA rendering path this project does reconstruct.
+/* EGA compatibility filter (--ega).  Static disassembly of data/dos/WC.EXE
+ * shows that graphics selector 1 rewrites resource extensions from .V* to .E*
+ * (file offset 0x20C96), and that video mode 0x0D uses fixed legacy colours
+ * instead of loading GAME.PAL (file offset 0x3F940).  The installed data here
+ * has only the VGA resources, so the SDL port converts the composed 320x200
+ * frame instead.
  *
- * The table and algorithm below come from live-tracing retail WING
- * COMMANDER's own DOS installer (INSTALL.EXE), the program that actually
- * performed the one-time VGA->EGA art conversion at install time on real
- * EGA installs, via a paused DOSBox Staging debugger session (see
- * D:\Git\openprivateer\doc\dosbox_debugger_bridge.md for the bridge this
- * used). Traced live, not guessed:
- *   - INSTALL.EXE's own conversion routine loads a 256-entry table, one
- *     byte per possible VGA palette index, where each byte packs *two*
- *     4-bit EGA color indices (high nibble, low nibble).
- *   - Its inner per-pixel loop looks up this table for the current VGA
- *     index, then does `xor bx, 100h` after every single emitted pixel --
- *     alternating between the table's high-nibble and low-nibble half on
- *     every pixel, seeded per-scanline so the pattern lines up into a
- *     checkerboard rather than plain horizontal stripes.
- *   - This is a genuine 2-color ordered dither using a hand-authored
- *     VGA-index -> EGA-color-pair table, not per-channel RGB math -- a
- *     "nearest EGA color" quantizer would not reproduce this look.
- * The table itself was read directly out of live DOSBox memory mid-
- * conversion (the installer's own in-RAM copy, table selector 0 -- the
- * only selector observed live; if other selectors exist for different
- * image classes they were not captured). The per-scanline checkerboard
- * seed `(x+y)&1` reproduces the confirmed "toggle every pixel" mechanism
- * exactly; the installer's own precise seed computation was not
- * independently re-derived bit-for-bit, so this is the standard ordered-
- * dither seed, not a byte-exact trace of that one instruction sequence. */
+ * This table is byte-identical to data/dos/GAMEDAT/CONVERT.PAL (SHA-256
+ * 5f58910e2f34fd0276f43ac962c2646269c0441062cddd450c9becd65f498dcb).
+ * The compatibility filter interprets each byte's two nibbles as EGA indices.
+ * Its screen-space checkerboard phase is an SDL-port approximation; it is not
+ * claimed to reproduce the offline asset converter byte for byte. */
 static int g_bEgaDitherEnabled;
 static unsigned char g_abEgaDitherPixels[
     SDL_PORT_FRAME_WIDTH * SDL_PORT_FRAME_HEIGHT];
-static unsigned char g_abEgaDitherPalette[16 * 4];
+/* Both host renderers accept a complete 256-entry [B,G,R,pad] palette even
+ * though converted pixels only use the first 16 entries. */
+static unsigned char g_abEgaDitherPalette[256 * 4];
 
 static const unsigned char g_abEgaDitherTable[256] = {
     0x00, 0x00, 0x00, 0x80, 0x80, 0x88, 0x88, 0x78, 0x78, 0x77, 0x77, 0x77, 0xf7, 0xf7, 0xff, 0xff,
@@ -245,7 +230,10 @@ int SdlRecordSpaceSprite(
     unsigned char *shape, short frame, short angle, short scale,
     short flip)
 {
-    if (!SdlUsingGlRenderer())
+    /* DOS EGA mode composes converted EGA shapes into its 320x200 indexed
+     * frame.  Keep that composition point: the enhanced layer contains VGA
+     * indices and cannot be sampled through the fixed 16-colour palette. */
+    if (!SdlUsingGlRenderer() || g_bEgaDitherEnabled)
         return 0;
     return SdlGlRendererRecordSpaceSprite(
         viewport, x, y, shape, frame, angle, scale, flip);

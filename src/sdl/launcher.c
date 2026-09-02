@@ -88,6 +88,17 @@ static void SdlApplyLegacyArguments(int argumentCount, char **arguments)
 
 static int SdlRunRuntimeChecks(void)
 {
+    unsigned char framePalette[256 * 4];
+    unsigned char framePixels[
+        SDL_PORT_FRAME_WIDTH * SDL_PORT_FRAME_HEIGHT];
+
+    /* Exercise the full presentation contract, including the GL backend's
+     * copy of all 256 palette entries. */
+    memset(framePixels, 0, sizeof(framePixels));
+    memset(framePalette, 0, sizeof(framePalette));
+    if (!SdlPresentIndexedFrame(framePixels, framePalette))
+        return 1;
+
     aShipWeapons[1][0] = 2;
     remove_weapon(1, 0);
     if (aShipWeapons[1][0] != 1)
