@@ -39,6 +39,8 @@ static int SdlParsePortArguments(int *argumentCount, char **arguments,
                         argument + 16);
                 return 0;
             }
+        } else if (strcmp(argument, "--ega") == 0) {
+            SdlEnableEgaDither();
         } else {
             arguments[outputArgumentIndex++] = argument;
         }
