@@ -10,6 +10,9 @@ Kilrathi Saga data and has partial support for the original DOS game data.
 
 No copyrighted game data is included.
 
+If you find this project useful, you can [support its development through
+GitHub Sponsors](https://github.com/sponsors/neuromancer).
+
 ## Status
 
 All 1,472 identified functions are accounted for: 1,470 have source
